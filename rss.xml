@@ -5,62 +5,12 @@
         <title>SANSWL's BLOG</title>
         <link>https://sanswl.github.io//</link>
         <description>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</description>
-        <lastBuildDate>Sun, 21 Sep 2025 05:21:42 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 21 Sep 2025 05:28:18 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
         <language>zh</language>
         <copyright>Copyright © 2025 SANSWL</copyright>
         <atom:link href="https://sanswl.github.io/rss.xml" rel="self" type="application/rss+xml"/>
-        <item>
-            <title><![CDATA[comfyUi学习游玩]]></title>
-            <link>https://sanswl.github.io//posts/comfyui-studypreview/</link>
-            <guid isPermaLink="false">https://sanswl.github.io//posts/comfyui-studypreview/</guid>
-            <pubDate>Thu, 18 Sep 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[comfyUI 是一个利用 AI 大模型来进行文创的工作流软件，包括文生图、文生视频、生成3D模型等。安装指导 国内，以及新手用户推荐安装秋...]]></description>
-            <content:encoded><![CDATA[<h3>1. 软件介绍</h3>
-<p>comfyUI 是一个利用 AI 大模型来进行文创的工作流软件，包括文生图、文生视频、生成3D模型等。</p>
-<h3>2. 软件安装</h3>
-<p><a href="https://comfyui-wiki.com/zh/install/install-comfyui/comfyui-desktop-installation-guide">安装指导</a></p>
-<blockquote>
-<p>国内，以及新手用户推荐安装秋叶整合包</p>
-</blockquote>
-<h3>3. 软件使用</h3>
-<h4>3.1 模型</h4>
-<blockquote>
-<p>comfyUI 是利用大模型依据提示词(Prompt)和设定好的工作流，进行流水作业，输出图、视频、3D模型等 。</p>
-<ol>
-<li>安装模型：
-模型分类，如下图： checkPoint、vae 、lora、ControlNet等，checkPoint是理解提示词的模型（最基本最重要的模型），lora是风格迁移的模型（譬如，西部、日系、动漫），vae是生成图像的模型（提高图像质量），ControlNet控制生成期望的结果的模型（比如人物姿势，蒙版填充等），embedding是提示词模型（提高提示词效果以及避免写大量提示词，减少无意义的提示词）。
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920220242099-2018688605.png" alt="image" />
-2.模型下载存放位置
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920220915899-913863422.png" alt="image" /></li>
-<li>模型下载：
-<a href="https://huggingface.co/">huggingface</a> 以及 <a href="https://civitai.com/">CivitAI</a> 等，按需下载，<strong>注意</strong>: vae 等增强 checkpoint模型的模型，需要和对应的模型版本匹配，否则可能无法理解和解析。</li>
-</ol>
-</blockquote>
-<h4>3.2 工作流</h4>
-<blockquote>
-<p>上图展示了一个较为基本的工作流，更多工作流可查看<a href="https://openart.ai/workflows/home">OpenArt</a>、<a href="https://www.runninghub.ai/?inviteCode=rh-v1121">runninghub(国内)</a>等&lt;br&gt; 基础工作流例子可查看官方提供的工作流，工作流保存目录如下：
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920222212509-801206479.png" alt="image" /></p>
-</blockquote>
-<h4>3.3 自定义节点</h4>
-<blockquote>
-<p>当你下载上述网址的分享工作流后，可能会存在本地没有的节点，这时需要下载这些缺失节点，你可以选择通过官方提示进行下载，或者手动通过git下载
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920225207649-1115064780.png" alt="image" />
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920222625140-441118962.png" alt="image" /></p>
-</blockquote>
-<h4>3.4 自定义节点结构</h4>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920223731563-1657179072.png" alt="简单自定义节点基本结构" /></p>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920225557374-275739624.png" alt="复杂自定义节点基本结构-阿里千问视频模型节点" /></p>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920230333624-1599168561.png" alt="节点信息" /></p>
-<p><a href="https://docs.comfy.org/custom-nodes/walkthrough">官方文档-自定义节点</a></p>
-<ol>
-<li><code>node.py</code>: 节点的定义和注册</li>
-<li><code>___init__.py</code>: 客户端的扩展</li>
-<li><code>js</code>: 逻辑功能的实现</li>
-</ol>
-]]></content:encoded>
-        </item>
         <item>
             <title><![CDATA[AI-agents]]></title>
             <link>https://sanswl.github.io//posts/ai-agents-study/</link>
@@ -234,17 +184,69 @@ public class WetherMcpServer {
 </ol>
 <h3>4. 测试MCP</h3>
 <ol>
-<li>配置MCP服务，以Cherry Studio为例
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920233729526-2061079896.png" alt="image" />
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920233912778-1981479759.png" alt="image" /></li>
-<li>将MCP服务绑定大模型，再使用对应模型的助手工具进行测试
-<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920234132738-763700399.png" alt="image" /></li>
+<li>配置MCP服务，以Cherry Studio为例</li>
 </ol>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920233729526-2061079896.png" alt="" /></p>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920233912778-1981479759.png" alt="" /></p>
+<ol>
+<li>将MCP服务绑定大模型，再使用对应模型的助手工具进行测试</li>
+</ol>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920234132738-763700399.png" alt="" /></p>
 <h3>5. RAG（Retrieval Augmented Generation）</h3>
 <blockquote>
 <p>通过指定数据源以增强LLM的生成能力，提高准确性。</p>
 </blockquote>
 <h3>6. 模型微调（Fine-tuning）</h3>
+]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[comfyUi学习游玩]]></title>
+            <link>https://sanswl.github.io//posts/comfyui-studypreview/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/comfyui-studypreview/</guid>
+            <pubDate>Thu, 18 Sep 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[comfyUI 是一个利用 AI 大模型来进行文创的工作流软件，包括文生图、文生视频、生成3D模型等。安装指导 国内，以及新手用户推荐安装秋...]]></description>
+            <content:encoded><![CDATA[<h3>1. 软件介绍</h3>
+<p>comfyUI 是一个利用 AI 大模型来进行文创的工作流软件，包括文生图、文生视频、生成3D模型等。</p>
+<h3>2. 软件安装</h3>
+<p><a href="https://comfyui-wiki.com/zh/install/install-comfyui/comfyui-desktop-installation-guide">安装指导</a></p>
+<blockquote>
+<p>国内，以及新手用户推荐安装秋叶整合包</p>
+</blockquote>
+<h3>3. 软件使用</h3>
+<h4>3.1 模型</h4>
+<blockquote>
+<p>comfyUI 是利用大模型依据提示词(Prompt)和设定好的工作流，进行流水作业，输出图、视频、3D模型等 。</p>
+<ol>
+<li>安装模型：
+模型分类，如下图： checkPoint、vae 、lora、ControlNet等，checkPoint是理解提示词的模型（最基本最重要的模型），lora是风格迁移的模型（譬如，西部、日系、动漫），vae是生成图像的模型（提高图像质量），ControlNet控制生成期望的结果的模型（比如人物姿势，蒙版填充等），embedding是提示词模型（提高提示词效果以及避免写大量提示词，减少无意义的提示词）。
+<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920220242099-2018688605.png" alt="image" />
+2.模型下载存放位置
+<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920220915899-913863422.png" alt="image" /></li>
+<li>模型下载：
+<a href="https://huggingface.co/">huggingface</a> 以及 <a href="https://civitai.com/">CivitAI</a> 等，按需下载，<strong>注意</strong>: vae 等增强 checkpoint模型的模型，需要和对应的模型版本匹配，否则可能无法理解和解析。</li>
+</ol>
+</blockquote>
+<h4>3.2 工作流</h4>
+<blockquote>
+<p>上图展示了一个较为基本的工作流，更多工作流可查看<a href="https://openart.ai/workflows/home">OpenArt</a>、<a href="https://www.runninghub.ai/?inviteCode=rh-v1121">runninghub(国内)</a>等&lt;br&gt; 基础工作流例子可查看官方提供的工作流，工作流保存目录如下：
+<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920222212509-801206479.png" alt="image" /></p>
+</blockquote>
+<h4>3.3 自定义节点</h4>
+<blockquote>
+<p>当你下载上述网址的分享工作流后，可能会存在本地没有的节点，这时需要下载这些缺失节点，你可以选择通过官方提示进行下载，或者手动通过git下载
+<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920225207649-1115064780.png" alt="image" />
+<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920222625140-441118962.png" alt="image" /></p>
+</blockquote>
+<h4>3.4 自定义节点结构</h4>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920223731563-1657179072.png" alt="简单自定义节点基本结构" /></p>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920225557374-275739624.png" alt="复杂自定义节点基本结构-阿里千问视频模型节点" /></p>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250920230333624-1599168561.png" alt="节点信息" /></p>
+<p><a href="https://docs.comfy.org/custom-nodes/walkthrough">官方文档-自定义节点</a></p>
+<ol>
+<li><code>node.py</code>: 节点的定义和注册</li>
+<li><code>___init__.py</code>: 客户端的扩展</li>
+<li><code>js</code>: 逻辑功能的实现</li>
+</ol>
 ]]></content:encoded>
         </item>
         <item>
@@ -394,6 +396,326 @@ jobs:
 <li>等待几分钟，刷新域名解析，如果解析成功，则你的域名应该可以访问到你的博客了。&lt;br&gt;</li>
 </ol>
 </blockquote>
+]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[基于线程池队列的简单批处理操作]]></title>
+            <link>https://sanswl.github.io//posts/java-threadpool-batch-operation/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/java-threadpool-batch-operation/</guid>
+            <pubDate>Wed, 10 Sep 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[日常开发中，会遇到需要进行批处理操作任务的需求，譬如批量执行查询任务，批量执行某某操作等。批处理框架有 spring batch、Apac...]]></description>
+            <content:encoded><![CDATA[<h3>背景</h3>
+<blockquote>
+<p>日常开发中，会遇到需要进行批处理操作任务的需求，譬如批量执行查询任务，批量执行某某操作等。批处理框架有 <code>spring batch</code>、<code>Apache Spark</code>、<code>Apache Flink</code> 等，但这些框架都需要依赖于数据库，或者需要额外的配置已经非必要的功能。因此，对于一些简单的批处理任务，我们可以考虑使用线程池来实现。&lt;br&gt;
+线程池的优点是无需额外导入依赖，减轻项目负担，且有现成的任务队列可以满足需求。</p>
+</blockquote>
+<h3>实现</h3>
+<p><strong>注意：</strong> 线程池的任务队列添加任务时，是直接加入队列的，而不是等待线程池中的线程空闲后再加入。</p>
+<pre><code>public class BatchCalManger {
+    private static final ThreadPoolExecutor executor;
+
+    static {
+        // 设定的线程池最大线程数为1，队列容量为无限大且是按FIFO（先进先出）的顺序排队，线程空闲时间为0ms
+        ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue&lt;&gt;());
+        executor = executorService;
+    }
+
+
+    
+    public static void execute(Runnable runnable){
+        executor.execute(runnable);
+    }
+
+
+    public static void stop() {
+        //清空任务队列，已经执行的任务不会受影响
+        executor.getQueue().clear();
+    }
+}
+</code></pre>
+<h3>使用</h3>
+<pre><code>public class BatchTest {
+    public static void main(String[] args) {
+        BatchCalManger.execute(() -&gt; System.out.println("hello world1"));
+        BatchCalManger.execute(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("hello world2");
+            }
+        });
+    }
+}
+</code></pre>
+]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[Kafka快速认知 (draft)]]></title>
+            <link>https://sanswl.github.io//posts/kafkacognition-start/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/kafkacognition-start/</guid>
+            <pubDate>Mon, 11 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[topic 主题为消息队列，内部Partition分区提高消息的吞吐；<br> 文件结构 dir：<br> | --{topic1}-0...]]></description>
+            <content:encoded><![CDATA[<h3>KafKa 结构</h3>
+<h3>KafKa Topic</h3>
+<blockquote>
+<p>topic 主题为消息队列，内部Partition分区提高消息的吞吐；&lt;br&gt;
+文件结构 dir：&lt;br&gt;
+| --{topic1}-0   &lt;br&gt;
+| -- 00000000xx.index &lt;br&gt;
+| -- 00000000xx.log &lt;br&gt;
+| -- ...  &lt;br&gt;
+index : N: 表示第N个Message，position表示消息的偏移地址</p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250921081126954-365637170.png" alt="分段日志文件" /></p>
+<h3>KafKa 生产者</h3>
+<h3>KafKa 消费者</h3>
+<h3>KafKa 常见问题</h3>
+<h5>可用性和持久性保证</h5>
+<p>保证数据完整性，一致性：
+ISR： Kafka 动态维护了一个同步状态的备份节点的集合 （a set of in-sync replicas）， 简称 ISR ，在这个集合中的节点都是和 leader 保持高度一致的，只有这个集合的成员才 有资格被选举为 leader，一条消息必须被这个集合 所有 节点读取并追加到日志中了，这条消息才能视为提交。
+ISR控制参数：剔出ISR集合
+<code>replica.lag.max.messages  before 0.9x</code>
+<code>replica.lag.time.max.ms   after 0.9x</code>
+producer：
+ack： 0：不等待broker返回确认消息；
+1: leader保存成功返回或；
+-1(all): 所有备份都保存成功返回
+注意：ack为all时，只要ISR同步完成就返回，例如多个副本下，可能没有全部副本完成同步<br />
+方案：通过指定ISR集合大小减小数据丢失的可能性，仅在all下可用，降低可用性
+min.insync.replicas 配置ISR集合大小，一旦ISR大小少于配置数量，不再提供写能力
+consumer:</p>
+<ol>
+<li>
+<p>自动确认模式
+● RECORD
+每条消息处理完成后立即提交 Offset。
+风险：若消费逻辑未完成时消费者宕机，消息可能丢失[12] [38]。
+● BATCH
+处理完一批消息后批量提交 Offset。
+适用场景：批量消费时减少提交频率，提升性能[17] [30]。
+● TIME
+按固定时间间隔提交 Offset（如每 5 秒）。
+缺点：若间隔过长且消费频率高，宕机时可能重复消费大量消息[41]。
+● COUNT
+累积处理指定数量消息后提交 Offset（如每 100 条）。
+平衡点：在吞吐量和数据可靠性间折中[12] [33]。</p>
+</li>
+<li>
+<p>手动确认模式
+● MANUAL
+手动调用 acknowledge() 方法提交 Offset，通常在业务逻辑完成后执行。
+示例：  优点：避免消息处理未完成时提交 Offset 导致数据丢失[19] [40]。
+● MANUAL_IMMEDIATE
+与 MANUAL 类似，但提交 Offset 的请求会立即发送至 Broker，而非等待批次处理。
+性能影响：频繁提交可能降低吞吐量，适合对可靠性要求极高的场景[14] [38]。
+死信队列 、延迟队列
+死信队列: 利用消息消费errhandler，创建DeadLetterPublishingRecoverer对象，死信消费topic为对应topic.DLT;消费者消费异常
+@Bean
+@Primary
+public ErrorHandler kafkaErrorHandler(KafkaTemplate&lt;?, ?&gt; template) {</p>
+<p>logger.warn("kafkaErrorHandler begin to Handle");</p>
+<p>// &lt;1&gt; 创建 DeadLetterPublishingRecoverer 对象
+ConsumerRecordRecoverer recoverer = new DeadLetterPublishingRecoverer(template);
+// &lt;2&gt; 创建 FixedBackOff 对象   设置重试间隔 10秒 次数为 3次
+BackOff backOff = new FixedBackOff(10 * 1000L, 3L);
+// &lt;3&gt; 创建 SeekToCurrentErrorHandler 对象
+return new SeekToCurrentErrorHandler(recoverer, backOff);
+}
+Windows Kafka异常退出
+kafka日志清理策略触发，在window环境下，在打开需要清理的日志的同时，对该文件进行重命名操作是不被允许的，从而导致kafka宕机。</p>
+</li>
+</ol>
+<p>消费打点
+Callback:实现此接口，自定义逻辑，当消息消费完成执行
+ProducerInterceptor:在生产者将消息发布到server之前拦截</p>
+]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[Mysql优化]]></title>
+            <link>https://sanswl.github.io//posts/mysql-optimize-sql/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/mysql-optimize-sql/</guid>
+            <pubDate>Mon, 11 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[MySQL慢查询日志 修改配置文件 slow _query_log <br> SET GLOBAL slow_query_log = 1...]]></description>
+            <content:encoded><![CDATA[<h3>分析sql</h3>
+<p>MySQL慢查询日志</p>
+<blockquote>
+<ol>
+<li>修改配置文件 <code>slow _query_log</code> &lt;br&gt;</li>
+<li><code>SET GLOBAL slow_query_log = 1;</code> 开启慢查询日志 session 级别 &lt;br&gt;</li>
+<li>修改慢查询阈值 即定义多长时间的sql为慢sql，long_query_time(default: 10 sec)&lt;br&gt;</li>
+</ol>
+</blockquote>
+<p><code>explain</code>命令可以分析sql的执行计划，可以帮助我们分析sql的性能瓶颈。
+语法：</p>
+<pre><code>#1. explain select * from table_name;
+
+#2. explain format=json select * from table_name;
+</code></pre>
+<p>执行explain命令：
+<img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250921061230255-1941489668.png" alt="image" /></p>
+<p><code>type：</code></p>
+<blockquote>
+<p>system：系统表，少量数据，往往不需要进行磁盘IO &lt;br&gt;
+const：常量连接 &lt;br&gt;
+eq_ref：主键索引(primary key)或者非空唯一索引(unique not null)等值扫描 &lt;br&gt;
+ref：非主键非唯一索引等值扫描 &lt;br&gt;
+range：范围扫描 index：索引树扫描 * &lt;br&gt;
+ALL：全表扫描(full table scan)&lt;br&gt;
+<code>system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL</code> &lt;br&gt;</p>
+</blockquote>
+<p><code>key_len:</code></p>
+<blockquote>
+<p>索引长度，影响索引存储数量&lt;br&gt;</p>
+</blockquote>
+<p><code>extra:</code></p>
+<blockquote>
+<p>Extra 列包含查询优化器的额外信息。常见的值有：&lt;br&gt;
+● Using where：表示查询使用了 WHERE 过滤条件,需要在server层进行过滤。&lt;br&gt;
+● Using index：表示查询只使用了索引，不需要回表查询数据。&lt;br&gt;
+● Using filesort：表示查询需要额外的排序操作，这是一个性能瓶颈。&lt;br&gt;
+● Using temporary：表示查询使用了临时表，这是一个性能瓶颈。&lt;br&gt;
+优化建议：尽量避免 Using filesort 和 Using temporary，可以通过调整查询语句、增加索引或优化表结构来消除这些性能瓶颈。&lt;br&gt;</p>
+</blockquote>
+<p><code>rows:</code></p>
+<blockquote>
+<p>扫描的行数，影响查询性能,联表操作时，连接列最好保持一致&lt;br&gt;</p>
+</blockquote>
+<p><code>filtered:</code></p>
+<blockquote>
+<p>表示查询条件过滤的行数占总行数的比例，可以用来判断是否需要进行优化，代表着查询条件、索引的有效性、高效性&lt;br&gt;</p>
+</blockquote>
+<p>估计性能： Mysql索引选择：cost  《=》 server_cost+engine_cost &lt;br&gt;
+<code>cost_info:</code></p>
+<blockquote>
+<p>● server_cost：优化器成本估算 服务器成本&lt;br&gt;
+● engine_cost：优化器成本估算 特定存储引擎成本&lt;br&gt;
+主查询成本详情 (cost_info)  <code>使用 explain format=json query 查看</code>  &lt;br&gt;
+○ read_cost: "545.00" 数据读取成本（I/O相关）&lt;br&gt;
+○ eval_cost: "17889.20" 数据计算处理成本&lt;br&gt;
+○ prefix_cost: "18434.20" 当前操作及之前所有操作的累计成本&lt;br&gt;
+○ data_read_per_join: "151M" 连接操作读取的数据量&lt;br&gt;</p>
+</blockquote>
+<h3>优化目标</h3>
+<blockquote>
+<p>根据上面 explain 的结果，我们可以得出以下结论：&lt;br&gt;</p>
+<ol>
+<li>保证索引的高效使用，避免索引失效，减少回表操作等</li>
+<li>查询操作尽可能减少数据库的额外操作，譬如避免使用 filesort 和 Using temporary &lt;br&gt;</li>
+<li>控制查询数据量级，减少过滤查询的行数 &lt;br&gt;</li>
+</ol>
+</blockquote>
+<h3>优化方案</h3>
+<p><a href="https://dev.mysql.com/doc/refman/8.4/en/select-optimization.html">Mysql优化 -官方文档</a></p>
+<p>优化实例：</p>
+<ol>
+<li>减少IO：</li>
+</ol>
+<pre><code>-- 利用case when 分情况处理数据，减少IO消耗
+update table_name 
+set 
+column_name1 =  case when column_name1 = 'value1' then 'value2',
+column_name2 =  case when column_name2 = 'value2' then 'value3'
+-- 注意 case when 如果没设置 else 则默认会将数据重设为 null，
+-- 如需保持原样请使用else column_name 或者 where限制条件 
+
+--索引覆盖，避免回表查询
+-- index(name,phone)
+EXPLAIN SELECT name,phone FROM user WHERE name= '陈艮' AND phone = '13601994087';
+EXPLAIN SELECT name,phone FROM user WHERE name= '陈艮' AND phone = '13601994087';
+EXPLAIN SELECT name FROM user WHERE name= '陈艮' AND phone = '13601994087';
+EXPLAIN SELECT phone FROM user WHERE name= '陈艮' AND phone = '13601994087';
+</code></pre>
+<ol>
+<li>控制查询数据量级：</li>
+</ol>
+<pre><code>-- 例如深分页,通过跳过已查询的id来减少查询数据量，逻辑和ES的 search_after 类似
+-- 前提需要保证查询操作的id有序且连续，且分页期间数据不能更改以免数据不一致，ES 利用 ptr机制处理，可参考
+select * from table_name limit 1000,10 where id &gt; 1000000000;
+</code></pre>
+<ol>
+<li>索引优化：</li>
+</ol>
+<blockquote>
+<p>索引页默认大小16KB（innodb_page_size）
+存储索引数=》16kb*1024(字节) / (point_ptr[ 6字节]+index[bigint 8字节]) ==》1170</p>
+</blockquote>
+<pre><code>-- 1. 索引字段选择：
+-- 索引字段选择应尽量选择区分度高的字段，区分度高的字段可以有效减少索引的大小，提高查询效率。
+-- 2. 索引字段类型选择：
+-- 索引字段类型选择应尽量选择较小的数据类型，减少索引的大小，提高查询效率。
+-- 3. 索引字段长度选择：
+-- 索引字段长度选择应尽量选择较短的长度，减少索引的大小，提高查询效率。
+
+select col1, col2, col3 from table_name where col2 = 'value2';
+</code></pre>
+<p>参考链接：
+<a href="https://developer.aliyun.com/article/841106">MySQL索引从基础到原理</a>
+<a href="https://www.cnblogs.com/myseries/p/11262054.html">explain extra 分析</a></p>
+]]></content:encoded>
+        </item>
+        <item>
+            <title><![CDATA[文件锁实现]]></title>
+            <link>https://sanswl.github.io//posts/randomaccess-file-lock/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/randomaccess-file-lock/</guid>
+            <pubDate>Mon, 11 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[锁是一种同步机制，用于解决并发情况下访问共享资源时的竞争问题。而解决并发问题需要满足以下条件：原子性，可见性，互斥性。<br> 原子性：一...]]></description>
+            <content:encoded><![CDATA[<h3>锁的介绍</h3>
+<blockquote>
+<p>锁是一种同步机制，用于解决并发情况下访问共享资源时的竞争问题。而解决并发问题需要满足以下条件：原子性，可见性，互斥性。&lt;br&gt;</p>
+</blockquote>
+<blockquote>
+<p>原子性：一个操作是不可分割的，要么全部完成，要么全部不完成。&lt;br&gt;
+可见性：一个线程对共享资源的修改，其他线程立即可以看到。&lt;br&gt;
+互斥性：同一时刻，只有一个线程可以访问共享资源。&lt;br&gt;</p>
+</blockquote>
+<h3>文件锁的作用</h3>
+<blockquote>
+<p>为什么使用文件锁？&lt;br&gt;
+对已经启动的单机Java项目而言，使用<code>synchronized</code> 或 <code>ReentrantLock</code> 来实现同步机制是最简单的选择。但是，在分布式环境下和项目启动时，使用文件锁可以更好地控制并发访问或阻止项目的重复启动。MQTT 利用文件锁保证客户端连接唯一性，避免重复连接。&lt;br&gt;</p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250921060131376-867053781.png" alt="MQTT" /></p>
+<pre><code>public static void main(String[] args){
+        InstanceLockByFile fileLock = InstanceLockByFile.getFileLock();
+        fileLock.release(); //注册关闭钩子，项目结束时自动释放锁
+        if (fileLock.getInstanceLock()) {
+            // 如果已经有锁实例，说明已经有其他进程启动了，退出程序
+             System.exit(1);
+        }
+        SpringApplication.run(App.class, args);
+    }
+</code></pre>
+<h3>文件锁的实现</h3>
+<blockquote>
+<p>譬如 <code>Zookeeper</code> 利用的 Znode 和 watch 机制，实现的分布式锁就是利用了文件创建的唯一性。&lt;br&gt;
+利用创建文件和获取文件的读写权限来满足互斥、原子和可见性，实现文件锁。</p>
+</blockquote>
+<pre><code>/**
+ * 文件锁实现利用RandomAccessFile来实现,
+ * 注意如果你希望的是分布式或可多次创建的锁，
+ * 文件名需要保证唯一性，譬如分布式id处理文件名，UUID等。
+ */
+    File shutdownServerFile = new File("./");
+    rf = new RandomAccessFile(new File(shutdownServerFile.getCanonicalPath() + "/lock.txt"), "rws");
+    lock = rf.getChannel().tryLock();
+
+</code></pre>
+<pre><code>/**
+ * 释放锁
+ */
+public void release(){
+                Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; {
+                    try {
+                        rf.close();
+                        if (rf.getChannel().isOpen()){
+                            lock.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }));
+        }
+</code></pre>
 ]]></content:encoded>
         </item>
         <item>
@@ -934,36 +1256,6 @@ graph TD;
 ]]></content:encoded>
         </item>
         <item>
-            <title><![CDATA[MVCC 版本并发控制]]></title>
-            <link>https://sanswl.github.io//posts/b90d6666-487a/</link>
-            <guid isPermaLink="false">https://sanswl.github.io//posts/b90d6666-487a/</guid>
-            <pubDate>Tue, 11 Mar 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[必须是支持ACID的存储引擎，譬如Mysql的InnoDB <br> Mysql中mvcc的实现是利用undolog日志和 事务id 以及...]]></description>
-            <content:encoded><![CDATA[<h1>一 MVCC前提</h1>
-<blockquote>
-<p>必须是支持<code>ACID</code>的存储引擎，譬如Mysql的<code>InnoDB</code>  &lt;br&gt;
-Mysql中mvcc的实现是利用<code>undolog</code>日志和 <code>事务id</code> 以及 <code>ReadView</code>实现； &lt;br&gt;
-<code>ReadView（视图）</code>主要实现的完成事务间的数据可见性 &lt;br&gt;
-Mysql维护着redolog 、binlog、undolog三种日志：
-&lt;a href="https://blog.csdn.net/Weixiaohuai/article/details/117896523" name="redolog"&gt;redolog&lt;/a&gt;：用于数据库异常宕机的恢复工作；innodb存储引擎特有的；物理层；循环覆写 &lt;br&gt;
-&lt;a href="https://www.cnblogs.com/Presley-lpc/p/9619571.html" name="redolog"&gt;binlog&lt;/a&gt;: server共有、逻辑层；备份；追加写入append (需要配置文件开启默认关闭，每次重启都会创建新的binlog，且目录会创建mysql-binlog.index文件，内容为binlog文件名，会先从第一行读取，若第一行空会导致报错)&lt;br&gt;
-&lt;a href="https://zhuanlan.zhihu.com/p/383824552" name="redolog"&gt;undolog&lt;/a&gt; : 用于事务回滚，意为撤销或取消，以撤销操作为目的，将数据返回到某个状态的操作，实现事务的原子性</p>
-</blockquote>
-<h1>二 操作逻辑</h1>
-<blockquote>
-<p>利用Undolog文件中的回滚指针进行数据的回退,利用事务id和ReadView实现事务间的可见性 &lt;br&gt;
-二级索引可通过回表操作实现MVCC，另二级索引维护了自己最后操作的事务id <code>MAX_TRX_ID</code>,再通过 ReadView 中活跃事务id判断可见性；&lt;br&gt;
-DB_TRX_ID：记录最后一次修改该行的事务 ID。&lt;br&gt;
-DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&lt;br&gt;</p>
-</blockquote>
-<h1>三 视图可见性</h1>
-<blockquote>
-<p>视图依据创建时间维护一组活跃的事务ids，和视图创建范围的事务id，包含生成此视图后下一个生成的事务id和生成视图前活跃事务的最小id，利用事务id关系完成可见性判断</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311160745728-1401991784.png" alt="" /></p>
-]]></content:encoded>
-        </item>
-        <item>
             <title><![CDATA[Bat脚本启动本地Kafka]]></title>
             <link>https://sanswl.github.io//posts/bc002c30-f7c2/</link>
             <guid isPermaLink="false">https://sanswl.github.io//posts/bc002c30-f7c2/</guid>
@@ -975,10 +1267,10 @@ DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&l
 </blockquote>
 <h1>二：使用介绍</h1>
 <blockquote>
-<p>编写 <code>bat</code> 文件，将下述代码填入保存，<em><strong>注意路径配置</strong></em><br />
-<img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152627310-894820133.png" alt="" />
-<img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152735206-581968248.png" alt="" /></p>
+<p>编写 <code>bat</code> 文件，将下述代码填入保存，<em><strong>注意路径配置</strong></em></p>
 </blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152627310-894820133.png" alt="" /></p>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152735206-581968248.png" alt="" /></p>
 <pre><code>@echo off
 @REM 声明 UTF-8 编码，避免乱码问题
 chcp 65001
@@ -1220,6 +1512,36 @@ public interface ApiService {
 ]]></content:encoded>
         </item>
         <item>
+            <title><![CDATA[MVCC 版本并发控制]]></title>
+            <link>https://sanswl.github.io//posts/b90d6666-487a/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/b90d6666-487a/</guid>
+            <pubDate>Tue, 11 Mar 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[必须是支持ACID的存储引擎，譬如Mysql的InnoDB <br> Mysql中mvcc的实现是利用undolog日志和 事务id 以及...]]></description>
+            <content:encoded><![CDATA[<h1>一 MVCC前提</h1>
+<blockquote>
+<p>必须是支持<code>ACID</code>的存储引擎，譬如Mysql的<code>InnoDB</code>  &lt;br&gt;
+Mysql中mvcc的实现是利用<code>undolog</code>日志和 <code>事务id</code> 以及 <code>ReadView</code>实现； &lt;br&gt;
+<code>ReadView（视图）</code>主要实现的完成事务间的数据可见性 &lt;br&gt;
+Mysql维护着redolog 、binlog、undolog三种日志：
+&lt;a href="https://blog.csdn.net/Weixiaohuai/article/details/117896523" name="redolog"&gt;redolog&lt;/a&gt;：用于数据库异常宕机的恢复工作；innodb存储引擎特有的；物理层；循环覆写 &lt;br&gt;
+&lt;a href="https://www.cnblogs.com/Presley-lpc/p/9619571.html" name="redolog"&gt;binlog&lt;/a&gt;: server共有、逻辑层；备份；追加写入append (需要配置文件开启默认关闭，每次重启都会创建新的binlog，且目录会创建mysql-binlog.index文件，内容为binlog文件名，会先从第一行读取，若第一行空会导致报错)&lt;br&gt;
+&lt;a href="https://zhuanlan.zhihu.com/p/383824552" name="redolog"&gt;undolog&lt;/a&gt; : 用于事务回滚，意为撤销或取消，以撤销操作为目的，将数据返回到某个状态的操作，实现事务的原子性</p>
+</blockquote>
+<h1>二 操作逻辑</h1>
+<blockquote>
+<p>利用Undolog文件中的回滚指针进行数据的回退,利用事务id和ReadView实现事务间的可见性 &lt;br&gt;
+二级索引可通过回表操作实现MVCC，另二级索引维护了自己最后操作的事务id <code>MAX_TRX_ID</code>,再通过 ReadView 中活跃事务id判断可见性；&lt;br&gt;
+DB_TRX_ID：记录最后一次修改该行的事务 ID。&lt;br&gt;
+DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&lt;br&gt;</p>
+</blockquote>
+<h1>三 视图可见性</h1>
+<blockquote>
+<p>视图依据创建时间维护一组活跃的事务ids，和视图创建范围的事务id，包含生成此视图后下一个生成的事务id和生成视图前活跃事务的最小id，利用事务id关系完成可见性判断</p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311160745728-1401991784.png" alt="" /></p>
+]]></content:encoded>
+        </item>
+        <item>
             <title><![CDATA[Spring cloud GateWay]]></title>
             <link>https://sanswl.github.io//posts/47690543-517e/</link>
             <guid isPermaLink="false">https://sanswl.github.io//posts/47690543-517e/</guid>
@@ -1246,7 +1568,7 @@ public interface ApiService {
             args:
               name: foo,bar
               value: 1,100
-          #uri跳过字段，例如   /service1/hello ==》/hello 
+          #uri跳过字段，例如   /service1/hello ==》/hello
           - StripPrefix=1
 </code></pre>
 <p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311155047870-147292185.png" alt="" /></p>
@@ -1821,12 +2143,12 @@ https://docs.cnb.cool/zh/vscode/quick-start.html</p>
 <blockquote>
 <ol>
 <li>创建一个仓库,开启云平台初始化，使用cnb-init-from <s>https://your-git.com/your-repo.git</s>
-<s>git clone</s> https://github.com/infiniflow/ragflow.git [RAGFlow的GitHub仓库]
-<img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250304023728808-769939825.png" alt="" />
-<strong>初始化后，使其文件依赖结构如图所示，否则ragflow-server启动将失败</strong>
-<strong>OSError: [Errno loading yaml file config from /ragflow/conf/service_conf.yaml failed:] [Errno 2] No such file or directory: '/ragflow/conf/service_conf.yaml'</strong></li>
+<s>git clone</s> https://github.com/infiniflow/ragflow.git [RAGFlow的GitHub仓库]</li>
 </ol>
 </blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250304023728808-769939825.png" alt="" /></p>
+<p><strong>初始化后，使其文件依赖结构如图所示，否则ragflow-server启动将失败</strong>
+<strong>OSError: [Errno loading yaml file config from /ragflow/conf/service_conf.yaml failed:] [Errno 2] No such file or directory: '/ragflow/conf/service_conf.yaml'</strong></p>
 <blockquote>
 <ol>
 <li>Ragflow的部署，待下载完Ragflow（大约9G），进入到上图的ragflow/docker目录下，启动 <code>docker compose -f docker-compose.yml up -d</code>
