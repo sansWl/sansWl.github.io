@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//</id>
     <title>SANSWL's BLOG</title>
-    <updated>2025-09-22T12:15:35.932Z</updated>
+    <updated>2025-09-22T12:24:16.095Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -132,7 +132,7 @@
 </blockquote>
 <p><strong>复制状态机通常都是基于复制日志实现的，如下图所示。每一个服务器存储一个包含一系列指令的日志，并且按照日志的顺序进行执行。每一个日志都按照相同的顺序包含相同的指令，所以每一个服务器都执行相同的指令序列。因为每个状态机都是确定的，每一次执行操作都产生相同的状态和同样的序列。</strong> &lt;br&gt;
 <strong>一致性算法的任务是保证复制日志的一致性</strong></p>
-<p><img src="/src/content/posts/_images/raft-serverstate.png" alt="复制状态机结构图" /></p>
+<p><img src="https://sanswl.github.io/_astro/raft-serverstate.BhyO3NUb_Z1qscKD.webp" alt="复制状态机结构图" /></p>
 <p>Raft 通过选举一个杰出的领导人，然后给予他全部的管理复制日志的责任来实现一致性。领导人从客户端接收日志条目（log entries），把日志条目复制到其他服务器上，并告诉其他的服务器什么时候可以安全地将日志条目应用到他们的状态机中。拥有一个领导人大大简化了对复制日志的管理。例如，领导人可以决定新的日志条目需要放在日志中的什么位置而不需要和其他服务器商议，并且数据都从领导人流向其他服务器。一个领导人可能会发生故障，或者和其他服务器失去连接，在这种情况下一个新的领导人会被选举出来。</p>
 <p>通过领导人的方式，Raft 将一致性问题分解成了三个相对独立的子问题，这些问题会在接下来的子章节中进行讨论：</p>
 <p><strong>领导选举：</strong> 当现存的领导人发生故障的时候, 一个新的领导人需要被选举出来&lt;br&gt;
@@ -1892,6 +1892,41 @@ pause &gt;nul
         <published>2025-03-11T00:00:00.000Z</published>
     </entry>
     <entry>
+        <title type="html"><![CDATA[MVCC 版本并发控制]]></title>
+        <id>https://sanswl.github.io//posts/b90d6666-487a/</id>
+        <link href="https://sanswl.github.io//posts/b90d6666-487a/"/>
+        <updated>2025-03-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[必须是支持ACID的存储引擎，譬如Mysql的InnoDB <br> Mysql中mvcc的实现是利用undolog日志和 事务id 以及...]]></summary>
+        <content type="html"><![CDATA[<h1>一 MVCC前提</h1>
+<blockquote>
+<p>必须是支持<code>ACID</code>的存储引擎，譬如Mysql的<code>InnoDB</code>  &lt;br&gt;
+Mysql中mvcc的实现是利用<code>undolog</code>日志和 <code>事务id</code> 以及 <code>ReadView</code>实现； &lt;br&gt;
+<code>ReadView（视图）</code>主要实现的完成事务间的数据可见性 &lt;br&gt;
+Mysql维护着redolog 、binlog、undolog三种日志：
+&lt;a href="https://blog.csdn.net/Weixiaohuai/article/details/117896523" name="redolog"&gt;redolog&lt;/a&gt;：用于数据库异常宕机的恢复工作；innodb存储引擎特有的；物理层；循环覆写 &lt;br&gt;
+&lt;a href="https://www.cnblogs.com/Presley-lpc/p/9619571.html" name="redolog"&gt;binlog&lt;/a&gt;: server共有、逻辑层；备份；追加写入append (需要配置文件开启默认关闭，每次重启都会创建新的binlog，且目录会创建mysql-binlog.index文件，内容为binlog文件名，会先从第一行读取，若第一行空会导致报错)&lt;br&gt;
+&lt;a href="https://zhuanlan.zhihu.com/p/383824552" name="redolog"&gt;undolog&lt;/a&gt; : 用于事务回滚，意为撤销或取消，以撤销操作为目的，将数据返回到某个状态的操作，实现事务的原子性</p>
+</blockquote>
+<h1>二 操作逻辑</h1>
+<blockquote>
+<p>利用Undolog文件中的回滚指针进行数据的回退,利用事务id和ReadView实现事务间的可见性 &lt;br&gt;
+二级索引可通过回表操作实现MVCC，另二级索引维护了自己最后操作的事务id <code>MAX_TRX_ID</code>,再通过 ReadView 中活跃事务id判断可见性；&lt;br&gt;
+DB_TRX_ID：记录最后一次修改该行的事务 ID。&lt;br&gt;
+DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&lt;br&gt;</p>
+</blockquote>
+<h1>三 视图可见性</h1>
+<blockquote>
+<p>视图依据创建时间维护一组活跃的事务ids，和视图创建范围的事务id，包含生成此视图后下一个生成的事务id和生成视图前活跃事务的最小id，利用事务id关系完成可见性判断</p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311160745728-1401991784.png" alt="" /></p>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-03-11T00:00:00.000Z</published>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Eureka服务注册发现源码流程简析]]></title>
         <id>https://sanswl.github.io//posts/f14c8695-a3e9/</id>
         <link href="https://sanswl.github.io//posts/f14c8695-a3e9/"/>
@@ -2096,41 +2131,6 @@ public interface ApiService {
 等价于 new httpclient(eurekaClient) =&gt; 发送 /index 接口并接受到response
 */
 </code></pre>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-11T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[MVCC 版本并发控制]]></title>
-        <id>https://sanswl.github.io//posts/b90d6666-487a/</id>
-        <link href="https://sanswl.github.io//posts/b90d6666-487a/"/>
-        <updated>2025-03-11T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[必须是支持ACID的存储引擎，譬如Mysql的InnoDB <br> Mysql中mvcc的实现是利用undolog日志和 事务id 以及...]]></summary>
-        <content type="html"><![CDATA[<h1>一 MVCC前提</h1>
-<blockquote>
-<p>必须是支持<code>ACID</code>的存储引擎，譬如Mysql的<code>InnoDB</code>  &lt;br&gt;
-Mysql中mvcc的实现是利用<code>undolog</code>日志和 <code>事务id</code> 以及 <code>ReadView</code>实现； &lt;br&gt;
-<code>ReadView（视图）</code>主要实现的完成事务间的数据可见性 &lt;br&gt;
-Mysql维护着redolog 、binlog、undolog三种日志：
-&lt;a href="https://blog.csdn.net/Weixiaohuai/article/details/117896523" name="redolog"&gt;redolog&lt;/a&gt;：用于数据库异常宕机的恢复工作；innodb存储引擎特有的；物理层；循环覆写 &lt;br&gt;
-&lt;a href="https://www.cnblogs.com/Presley-lpc/p/9619571.html" name="redolog"&gt;binlog&lt;/a&gt;: server共有、逻辑层；备份；追加写入append (需要配置文件开启默认关闭，每次重启都会创建新的binlog，且目录会创建mysql-binlog.index文件，内容为binlog文件名，会先从第一行读取，若第一行空会导致报错)&lt;br&gt;
-&lt;a href="https://zhuanlan.zhihu.com/p/383824552" name="redolog"&gt;undolog&lt;/a&gt; : 用于事务回滚，意为撤销或取消，以撤销操作为目的，将数据返回到某个状态的操作，实现事务的原子性</p>
-</blockquote>
-<h1>二 操作逻辑</h1>
-<blockquote>
-<p>利用Undolog文件中的回滚指针进行数据的回退,利用事务id和ReadView实现事务间的可见性 &lt;br&gt;
-二级索引可通过回表操作实现MVCC，另二级索引维护了自己最后操作的事务id <code>MAX_TRX_ID</code>,再通过 ReadView 中活跃事务id判断可见性；&lt;br&gt;
-DB_TRX_ID：记录最后一次修改该行的事务 ID。&lt;br&gt;
-DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&lt;br&gt;</p>
-</blockquote>
-<h1>三 视图可见性</h1>
-<blockquote>
-<p>视图依据创建时间维护一组活跃的事务ids，和视图创建范围的事务id，包含生成此视图后下一个生成的事务id和生成视图前活跃事务的最小id，利用事务id关系完成可见性判断</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311160745728-1401991784.png" alt="" /></p>
 ]]></content>
         <author>
             <name>SANSWL</name>
