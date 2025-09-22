@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//</id>
     <title>SANSWL's BLOG</title>
-    <updated>2025-09-21T21:04:03.764Z</updated>
+    <updated>2025-09-22T12:15:35.932Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -13,6 +13,26 @@
     <link rel="self" href="https://sanswl.github.io/atom.xml"/>
     <subtitle>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</subtitle>
     <rights>Copyright © 2025 SANSWL</rights>
+    <entry>
+        <title type="html"><![CDATA[updf使用]]></title>
+        <id>https://sanswl.github.io//posts/updf-software/</id>
+        <link href="https://sanswl.github.io//posts/updf-software/"/>
+        <updated>2025-09-21T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[UPDF 官网 UPDF是一款集AI 、阅读、编辑、注释、格式转换、OCR、文档对比等近百项功能于一体的综合型 PDF 编辑软件。]]></summary>
+        <content type="html"><![CDATA[<h3>介绍</h3>
+<p><a href="https://www.updf.cn/"> UPDF 官网</a></p>
+<blockquote>
+<p>UPDF是一款集AI 、阅读、编辑、注释、格式转换、OCR、文档对比等近百项功能于一体的综合型 PDF 编辑软件。</p>
+</blockquote>
+<h3>使用</h3>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250922191709319-721477762.png" alt="image" /></p>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-09-21T00:00:00.000Z</published>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Nacos v2.5 源码阅读]]></title>
         <id>https://sanswl.github.io//posts/nacos-code-reading/</id>
@@ -93,6 +113,424 @@
 </blockquote>
 <p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250922040434461-71429088.png" alt="更新配置事件" /></p>
 <p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250922035931400-1477783068.png" alt="热更新执行流程" /></p>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-09-20T00:00:00.000Z</published>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[一致性算法Raft]]></title>
+        <id>https://sanswl.github.io//posts/raftlink-some/</id>
+        <link href="https://sanswl.github.io//posts/raftlink-some/"/>
+        <updated>2025-09-20T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[一致性算法允许一组机器像一个整体一样工作，即使其中一些机器出现故障也能够继续工作下去。Raft 是一种用来管理复制日志的算法。复制状态机通...]]></summary>
+        <content type="html"><![CDATA[<h3>1. 一致性算法</h3>
+<blockquote>
+<p>一致性算法允许一组机器像一个整体一样工作，即使其中一些机器出现故障也能够继续工作下去。Raft 是一种用来管理复制日志的算法。</p>
+</blockquote>
+<p><strong>复制状态机通常都是基于复制日志实现的，如下图所示。每一个服务器存储一个包含一系列指令的日志，并且按照日志的顺序进行执行。每一个日志都按照相同的顺序包含相同的指令，所以每一个服务器都执行相同的指令序列。因为每个状态机都是确定的，每一次执行操作都产生相同的状态和同样的序列。</strong> &lt;br&gt;
+<strong>一致性算法的任务是保证复制日志的一致性</strong></p>
+<p><img src="/src/content/posts/_images/raft-serverstate.png" alt="复制状态机结构图" /></p>
+<p>Raft 通过选举一个杰出的领导人，然后给予他全部的管理复制日志的责任来实现一致性。领导人从客户端接收日志条目（log entries），把日志条目复制到其他服务器上，并告诉其他的服务器什么时候可以安全地将日志条目应用到他们的状态机中。拥有一个领导人大大简化了对复制日志的管理。例如，领导人可以决定新的日志条目需要放在日志中的什么位置而不需要和其他服务器商议，并且数据都从领导人流向其他服务器。一个领导人可能会发生故障，或者和其他服务器失去连接，在这种情况下一个新的领导人会被选举出来。</p>
+<p>通过领导人的方式，Raft 将一致性问题分解成了三个相对独立的子问题，这些问题会在接下来的子章节中进行讨论：</p>
+<p><strong>领导选举：</strong> 当现存的领导人发生故障的时候, 一个新的领导人需要被选举出来&lt;br&gt;
+<strong>日志复制：</strong> 领导人必须从客户端接收日志条目（log entries）然后复制到集群中的其他节点，并强制要求其他节点的日志和自己保持一致。&lt;br&gt;
+<strong>安全性：</strong> 在 Raft 中安全性的关键是保证状态机安全：如果有任何的服务器节点已经应用了一个确定的日志条目到它的状态机中，那么其他服务器节点不能在同一个日志索引位置应用一个不同的指令。&lt;br&gt;</p>
+<h3>2. 实现介绍</h3>
+<p>Raft 算法的实现分为三个部分：&lt;br&gt;</p>
+<ol>
+<li>选举：Raft 使用一种选举算法来选举领导人。Raft 使用一种多数投票的方式来选举领导人，即超过半数的节点同意他的任期。&lt;br&gt;</li>
+<li>日志复制：Raft 使用消息传递的方式来同步复制日志。&lt;br&gt;</li>
+<li>安全性：Raft 通过确保日志的一致性来实现安全性。&lt;br&gt;</li>
+</ol>
+<h4>2.1 选举</h4>
+<ol>
+<li>选举过程： &lt;br&gt;</li>
+</ol>
+<blockquote>
+<p>初始所有节点均为 Follower，启动随机选举定时器，成为候选者，广播投票；</p>
+</blockquote>
+<ul>
+<li>等待响应</li>
+<li>收到大多数（majority）节点的同意票 → 成为 Leader。</li>
+<li>收到更高任期的消息 → 自动转为 Follower。</li>
+<li>超时未获多数票 → 重新开始新一轮选举（增加 term 再试）</li>
+</ul>
+<pre><code>graph TD
+   A[Follower] --&gt;|Election Timeout| B[Candidate]
+   B --&gt; C{"Increment Term votedFor = self"}
+   C --&gt; D[Send RequestVote to all others]
+   D --&gt; E{Received votes from majority?}
+   E --&gt;|Yes| F[Become Leader]
+   F --&gt; G[Send Heartbeats]
+   G --&gt;|AppendEntries| A
+   E --&gt;|No| H{Received AppendEntries with higher term?}
+   H --&gt;|Yes| I[Become Follower]
+   H --&gt;|No| J{Timeout again?}
+   J --&gt;|Yes| C
+   I --&gt; A
+</code></pre>
+<p><strong>1. 选举策略：多数投票</strong>&lt;br&gt;
+Q = N/2 + 1 &lt;br&gt;</p>
+<p><strong>2. 服务器配置：</strong> &lt;br&gt;</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Follower（追随者）</td>
+<td>初始状态；被动接收日志条目和心跳消息；若超时未收到 Leader 消息，则转变为 Candidate 并发起选举</td>
+</tr>
+<tr>
+<td>Candidate（候选人）</td>
+<td>在选举过程中产生；向其他节点请求投票以成为 Leader</td>
+</tr>
+<tr>
+<td>Leader（领导者）</td>
+<td>负责处理所有客户端请求、复制日志到其他节点，并定期发送心跳维持权威</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2.1 通信参数和定义</strong></p>
+<p>2.1.1. RequestVote RPC（请求投票）
+由 Candidate 发起，用于争取选票。</p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>term</td>
+<td>int</td>
+<td>候选人的当前任期</td>
+</tr>
+<tr>
+<td>candidateId</td>
+<td>string</td>
+<td>请求投票的候选者 ID</td>
+</tr>
+<tr>
+<td>lastLogIndex</td>
+<td>int</td>
+<td>候选人最后一条日志的索引</td>
+</tr>
+<tr>
+<td>lastLogTerm</td>
+<td>int</td>
+<td>候选人最后一条日志的任期</td>
+</tr>
+</tbody>
+</table>
+<p><code>返回值：</code></p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>term</td>
+<td>int</td>
+<td>当前任期</td>
+</tr>
+<tr>
+<td>voteGranted</td>
+<td>bool</td>
+<td>是否授予选票</td>
+</tr>
+</tbody>
+</table>
+<p>✅ 投票条件（安全性规则）：
+若 Follower 的 currentTerm &lt; candidate.term，拒绝投票。
+若 Follower 已在当前任期投过票，则不再投票。
+若候选者的日志至少与自己的日志一样新（通过比较 (lastLogTerm, lastLogIndex)），才允许投票。</p>
+<p>2.1.2. AppendEntries RPC（追加日志）
+由 Leader 发起，用于复制日志。</p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>term</td>
+<td>int</td>
+<td>领导人的当前任期</td>
+</tr>
+<tr>
+<td>leaderId</td>
+<td>string</td>
+<td>领导人的 ID</td>
+</tr>
+<tr>
+<td>prevLogIndex</td>
+<td>int</td>
+<td>新的日志条目的索引值</td>
+</tr>
+<tr>
+<td>prevLogTerm</td>
+<td>int</td>
+<td>新的日志条目的任期</td>
+</tr>
+<tr>
+<td>entries[]</td>
+<td>[]Entry</td>
+<td>日志条目(空表示心跳)</td>
+</tr>
+<tr>
+<td>leaderCommit</td>
+<td>int</td>
+<td>领导人已提交的日志索引值</td>
+</tr>
+</tbody>
+</table>
+<p><code>返回值：</code></p>
+<table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>term</td>
+<td>int</td>
+<td>当前任期</td>
+</tr>
+<tr>
+<td>success</td>
+<td>bool</td>
+<td>是否成功</td>
+</tr>
+</tbody>
+</table>
+<h4>2.2 日志复制</h4>
+<ol>
+<li>日志结构：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>term</td>
+<td>int</td>
+<td>任期编号</td>
+</tr>
+<tr>
+<td>index</td>
+<td>int</td>
+<td>日志索引位置</td>
+</tr>
+<tr>
+<td>command</td>
+<td>interface{}</td>
+<td>客户端请求的操作指令（例如 "set x=5"）</td>
+</tr>
+</tbody>
+</table>
+<p><code>关键原则：</code></p>
+<ul>
+<li>日志按 顺序写入，不可修改已提交条目。</li>
+<li>不同节点之间的日志可能暂时不一致，但最终通过 Leader 强制同步。</li>
+<li>只有当前 Leader 的日志条目可以被“提交”（committed）。</li>
+</ul>
+<ol>
+<li>日志复制流程：</li>
+</ol>
+<blockquote>
+<p>客户端发送请求到leader，leader将请求追加到本地日志<code>log[lastLogIndex+1] = { term: currentTerm, command: cmd }</code>，并广播发送 AppendEntries RPC，要求其他节点复制日志。</p>
+</blockquote>
+<pre><code>graph TD
+    A[Client] --&gt;|Send Request| B[Leader]
+    B --&gt; C[Add command to local log]
+    C --&gt; D[Send AppendEntries to Followers]
+    D --&gt; E{Check prevLog match?}
+    E --&gt;|Yes| F[Follower appends entry]
+    E --&gt;|No| G[Leader decrements nextIndex]
+    G --&gt; D
+    F --&gt; H{Achieve majority?}
+    H --&gt;|Yes| I[Leader commits entry]
+    I --&gt; J[Apply to state machine]
+    J --&gt; K[Respond to Client]
+    H --&gt;|No| D
+</code></pre>
+<p>&lt;br&gt;</p>
+<p><code>AppendEntries 请求</code></p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>值说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>term</td>
+<td>当前任期</td>
+</tr>
+<tr>
+<td>leaderId</td>
+<td>Leader 节点 ID</td>
+</tr>
+<tr>
+<td>prevLogIndex</td>
+<td>新条目前一个条目的索引（即 lastIndex）</td>
+</tr>
+<tr>
+<td>prevLogTerm</td>
+<td>prevLogIndex 对应的日志任期</td>
+</tr>
+<tr>
+<td>entries[]</td>
+<td>待复制的一组日志条目（通常一次一条）</td>
+</tr>
+<tr>
+<td>leaderCommit</td>
+<td>当前 Leader 的 commitIndex</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Follower 按如下规则处理请求：</strong> &lt;br&gt;
+检查任期：若 term &lt; currentTerm → 拒绝，返回 term。&lt;br&gt;
+查找 prevLog 匹配：&lt;br&gt;</p>
+<ul>
+<li>若本地日志中不存在 prevLogIndex 条目 → 拒绝。</li>
+<li>若存在但 log[prevLogIndex].term ≠ prevLogTerm → 删除冲突条目及其后续所有条目。
+追加新条目：将 entries[] 中的日志追加到本地日志。&lt;br&gt;
+更新 commitIndex：如果 leaderCommit &gt; commitIndex 且存在对应日志，则更新: <code>commitIndex = min(leaderCommit, lastIndex in log)</code>
+返回 success = true。&lt;br&gt;</li>
+</ul>
+<blockquote>
+<p>满足大多数条件后，leader 提交entry，并将其应用到状态机，然后响应客户端。</p>
+</blockquote>
+<ol>
+<li>日志冲突：当 Follower 日志与 Leader 不一致时 &lt;br&gt;
+Raft 使用 强制覆盖策略 解决：</li>
+</ol>
+<ul>
+<li>Leader 维护每个 Follower 的 nextIndex[i]（下一次要发送的日志索引）。</li>
+<li>初始值：nextIndex[i] = leader.lastIndex + 1</li>
+<li>若某次 AppendEntries 失败（Follower 返回 false）：
+<ul>
+<li>Leader 将 nextIndex[i]--，重新尝试发送更早的日志。</li>
+</ul>
+</li>
+<li>直到找到第一个匹配的 (prevLogIndex, prevLogTerm)，然后从该点开始覆盖后续所有日志。
+🧩 特性：Log Matching Property 如果两个日志在相同索引处有相同的任期号，则它们在此索引之前的所有条目都完全相同。</li>
+</ul>
+<h4>2.3 安全性</h4>
+<blockquote>
+<p>安全性指的是任何情况下，系统不会做出错误决策。</p>
+</blockquote>
+<ol>
+<li>选举安全性：投票仲裁 + 单次投票原则 &lt;br&gt;</li>
+</ol>
+<ul>
+<li>每个 Follower 在一个任期内只能投一次票；</li>
+<li>使用 votedFor 字段记录已投票的候选者 ID；</li>
+<li>投票请求必须满足日志新鲜度条件；</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>候选者日志</th>
+<th>自己日志</th>
+<th>是否投票</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>((term=3, idx=5)</td>
+<td>(term=2, idx=6)</td>
+<td>✅ 是（更高 term）</td>
+</tr>
+<tr>
+<td>(term=2, idx=4)</td>
+<td>(term=2, idx=6)</td>
+<td>❌ 否（同 term 但更短）</td>
+</tr>
+<tr>
+<td>(term=2, idx=6)</td>
+<td>(term=2, idx=6)</td>
+<td>✅ 是（相等）</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>状态机安全性 &lt;br&gt;
+✅ Raft 规则：只能提交当前任期的日志，且提交需多数确认 (majority) 。&lt;br&gt;
+提交条件严格限制：</li>
+</ol>
+<ul>
+<li>一个日志条目只有在其 Leader 任期内获得了多数节点的复制，才可以被提交。
+特别注意：</li>
+<li>不能仅因为老日志出现在多数节点上就提交它！</li>
+<li>必须通过当前 Leader 的新日志来“间接提交”老日志。</li>
+</ul>
+<ol>
+<li>成员变更安全性：避免脑裂  &lt;br&gt;
+✅ Raft 解决方案：两阶段成员变更（Joint Consensus）&lt;br&gt;
+使用联合共识（Joint Consensus）过渡：
+阶段 1：进入联合状态</li>
+</ol>
+<ul>
+<li>C_old,new = {A,B,C} ∪ {C,D,E}</li>
+<li>→ 任何操作必须同时获得 {A,B,C} 和 {C,D,E} 的多数批准
+阶段 2：退出联合状态</li>
+<li>完成同步后，切换为 C_new = {C,D,E}
+⚖️ 优点：任何时候都需要跨越新旧配置的交集，防止分裂。</li>
+</ul>
+<ol>
+<li>读操作安全性：ReadIndex 读（推荐） &amp; Lease-based Read（高性能）&lt;br&gt;</li>
+</ol>
+<p>方法 1：ReadIndex 读（推荐）</p>
+<ul>
+<li>Leader 记录当前 commitIndex；</li>
+<li>向多数节点确认自己仍是 Leader（无心跳冲突）；</li>
+<li>等待本地 lastApplied ≥ commitIndex；</li>
+<li>执行本地读取。
+✅ 保证读到最新的已提交数据。</li>
+</ul>
+<p>方法 2：Lease-based Read（高性能）</p>
+<ul>
+<li>Leader 获取一个租约（如 10ms），在此期间认为自己是唯一合法领导者；</li>
+<li>租约内直接本地读取，无需通信。</li>
+<li>⚠️ 依赖时钟同步，适合低延迟场景。</li>
+</ul>
+<p><strong>参考链接</strong>：</p>
+<ul>
+<li><a href="https://ramcloud.atlassian.net/wiki/download/attachments/6586375/raft.pdf">Raft 论文 pdf</a></li>
+<li><a href="https://github.com/maemual/raft-zh_cn/blob/master/raft-zh_cn.md">Raft 论文中文版</a></li>
+<li><a href="https://gitee.com/colins0902/raft-java-demo">Raft-java-demo</a></li>
+<li><a href="https://juejin.cn/post/6907151199141625870#heading-1">深度解析Raft</a></li>
+<li><a href="https://aijishu.com/a/1060000000494501">基于硬盘的 RAFT 状态机实现方法与挑战</a></li>
+<li><a href="https://eli.thegreenplace.net/2020/implementing-raft-part-0-introduction/">Implementing Raft</a></li>
+<li><a href="https://xie.infoq.cn/article/7e0d7c2c5bdd8c8ba150194b3">实战从零开始实现 Raft｜得物技术</a></li>
+</ul>
 ]]></content>
         <author>
             <name>SANSWL</name>
@@ -849,10 +1287,10 @@ public void release(){
         <updated>2025-08-05T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[官网文档：https://neo4j.com/docs/getting-started/ 1 : 创建免费的云库 Neo4j AuraDB...]]></summary>
         <content type="html"><![CDATA[<h3>1. Neo4j 介绍</h3>
-<blockquote>
 <p><img src="https://img2024.cnblogs.com/blog/3426265/202508/3426265-20250805171510361-834497409.png" alt="" /></p>
-</blockquote>
+<blockquote>
 <p>官网文档：https://neo4j.com/docs/getting-started/</p>
+</blockquote>
 <h3>2. 数据库实例创建</h3>
 <ul>
 <li>1 : <em><strong>创建免费的云库</strong></em></li>
@@ -1400,6 +1838,60 @@ graph TD;
         <published>2025-03-13T00:00:00.000Z</published>
     </entry>
     <entry>
+        <title type="html"><![CDATA[Bat脚本启动本地Kafka]]></title>
+        <id>https://sanswl.github.io//posts/bc002c30-f7c2/</id>
+        <link href="https://sanswl.github.io//posts/bc002c30-f7c2/"/>
+        <updated>2025-03-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[本地启动Kafka，当需要测试多个Kafka Broker时使用脚本启动多个实例 编写 bat 文件，将下述代码填入保存，注意路径配置 ...]]></summary>
+        <content type="html"><![CDATA[<h1>一：功能介绍</h1>
+<blockquote>
+<p>本地启动Kafka，当需要测试多个Kafka Broker时使用脚本启动多个实例</p>
+</blockquote>
+<h1>二：使用介绍</h1>
+<blockquote>
+<p>编写 <code>bat</code> 文件，将下述代码填入保存，<em><strong>注意路径配置</strong></em></p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152627310-894820133.png" alt="" /></p>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152735206-581968248.png" alt="" /></p>
+<pre><code>@echo off
+@REM 声明 UTF-8 编码，避免乱码问题
+chcp 65001
+setlocal enabledelayedexpansion  
+@REM 代表脚本启动的当前路径，如上图，脚本处于kafka\kafka_2.13-xxx
+set cds=%~dp0 
+set zookeeper_config=%cds%config\zookeeper.properties
+set zookeeper_Server=zookeeper-server-start.bat
+set kafka_server=%cds%bin\windows\kafka-server-start.bat
+set brokernum=0
+@REM %1 表示第一个参数，没有参数即server.properties缺失
+if "%1" == "" ( echo 请输入Kafka的Broker的配置文件路径 
+) else (
+
+   @REM 启动zookeeper
+   start "zookeeper" cmd /k call %cds%bin\windows\%zookeeper_Server%  %zookeeper_config%
+   timeout /t 2
+
+   @REM 按参数顺序启动 Kafka broker实例 打开的窗口按照 kafka_1、kafka_2命名格式
+   for %%i in (%*) do (
+    set /a brokernum += 1
+    @Rem  "kafka_"!brokernum!  窗口命名
+    start "kafka_"!brokernum! cmd /k call %kafka_server% %cds%%%i
+   )
+
+)
+
+
+
+pause &gt;nul
+</code></pre>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-03-11T00:00:00.000Z</published>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Eureka服务注册发现源码流程简析]]></title>
         <id>https://sanswl.github.io//posts/f14c8695-a3e9/</id>
         <link href="https://sanswl.github.io//posts/f14c8695-a3e9/"/>
@@ -1603,60 +2095,6 @@ public interface ApiService {
 /**
 等价于 new httpclient(eurekaClient) =&gt; 发送 /index 接口并接受到response
 */
-</code></pre>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-11T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Bat脚本启动本地Kafka]]></title>
-        <id>https://sanswl.github.io//posts/bc002c30-f7c2/</id>
-        <link href="https://sanswl.github.io//posts/bc002c30-f7c2/"/>
-        <updated>2025-03-11T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[本地启动Kafka，当需要测试多个Kafka Broker时使用脚本启动多个实例 编写 bat 文件，将下述代码填入保存，注意路径配置 ...]]></summary>
-        <content type="html"><![CDATA[<h1>一：功能介绍</h1>
-<blockquote>
-<p>本地启动Kafka，当需要测试多个Kafka Broker时使用脚本启动多个实例</p>
-</blockquote>
-<h1>二：使用介绍</h1>
-<blockquote>
-<p>编写 <code>bat</code> 文件，将下述代码填入保存，<em><strong>注意路径配置</strong></em></p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152627310-894820133.png" alt="" /></p>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152735206-581968248.png" alt="" /></p>
-<pre><code>@echo off
-@REM 声明 UTF-8 编码，避免乱码问题
-chcp 65001
-setlocal enabledelayedexpansion  
-@REM 代表脚本启动的当前路径，如上图，脚本处于kafka\kafka_2.13-xxx
-set cds=%~dp0 
-set zookeeper_config=%cds%config\zookeeper.properties
-set zookeeper_Server=zookeeper-server-start.bat
-set kafka_server=%cds%bin\windows\kafka-server-start.bat
-set brokernum=0
-@REM %1 表示第一个参数，没有参数即server.properties缺失
-if "%1" == "" ( echo 请输入Kafka的Broker的配置文件路径 
-) else (
-
-   @REM 启动zookeeper
-   start "zookeeper" cmd /k call %cds%bin\windows\%zookeeper_Server%  %zookeeper_config%
-   timeout /t 2
-
-   @REM 按参数顺序启动 Kafka broker实例 打开的窗口按照 kafka_1、kafka_2命名格式
-   for %%i in (%*) do (
-    set /a brokernum += 1
-    @Rem  "kafka_"!brokernum!  窗口命名
-    start "kafka_"!brokernum! cmd /k call %kafka_server% %cds%%%i
-   )
-
-)
-
-
-
-pause &gt;nul
 </code></pre>
 ]]></content>
         <author>
@@ -2490,154 +2928,5 @@ broker.shared_dispatch_ack_enabled = false
             <uri>https://sanswl.github.io//</uri>
         </author>
         <published>2025-03-04T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Java反射的应用]]></title>
-        <id>https://sanswl.github.io//posts/f242a294-4b91/</id>
-        <link href="https://sanswl.github.io//posts/f242a294-4b91/"/>
-        <updated>2025-03-03T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[按照对象属性排序（对象属性需要实现Comparable 【常见数据类型】） public static int getOrder(Demo...]]></summary>
-        <content type="html"><![CDATA[<blockquote>
-<p>按照对象属性排序（对象属性需要实现Comparable 【常见数据类型】）</p>
-</blockquote>
-<pre><code> public static int getOrder(Demo o1, Demo o2, String order) {
-        Field field;
-        Comparable value1;
-        Comparable value2;
-        try {
-            //查看是否存在排序字段，需要保证排序字段存在且是可比较的，即实现了Comparable接口
-            field = Arrays.stream(o1.getClass().getDeclaredFields()).filter(f -&gt; f.getName().equals(order)).findAny().orElse(null);
-            if (field != null) {
-                // 要求的排序字段不存在，不排序
-                return 0;
-            }
-            field.setAccessible(true);
-            value1 = (Comparable) field.get(o1);
-            value2 = (Comparable) field.get(o2);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return value1.compareTo(value2);
-    }
-</code></pre>
-<blockquote>
-<p>类方法的直接调用,声明一个顶级父类（接口），读取继承/实现父类的子实现方法，直接调用</p>
-</blockquote>
-<pre><code> //定义一个接口，用于定义处理器
-    public interface ArrayHandler{
-
-    }
-//检查方法签名是否符合要求
-  private Function&lt;List, List&gt; checkMethodAndReturnFunction(ArrayHandler arrayHandler,Method method) {
-        Type returnType = method.getReturnType();
-        Type[] parameterTypes = method.getParameterTypes();
-        //check if the method parameter is List &amp;&amp; parameter size is 1 and return type is List
-        if (parameterTypes.length == 1 &amp;&amp; parameterTypes[0] == List.class &amp;&amp; returnType == List.class){
-           //相当于一个Function，内部是invoke方法调用，当function调用apply时执行
-              return list -&gt; {
-               try {
-                   return (List) method.invoke(arrayHandler,list);
-               } catch (IllegalAccessException e) {
-                   throw new RuntimeException(e);
-               } catch (InvocationTargetException e) {
-                   throw new RuntimeException(e);
-               }
-           };
-        }
-        log.warn("The method {} is not a valid array handler, please check the method signature.",method.getName());
-        return null;
-    }
-
- public  List applyArrayLinkedHandler(List input){
-        List output=input;
-        synchronized(monitor){
-            if(ARRAYHANDLER.isEmpty()){
-                log.warn("No array handler found, please add array handler first.");
-                return output;
-            }
-            for(Function&lt;List,List&gt; handler:ARRAYHANDLER){
-                output=handler.apply(output);
-            }
-        }
-        return output;
-    }
-
-    public  List applyArrayHandler(List input) {
-        List output = input;
-        Set result;
-        synchronized (monitor) {
-            if (ARRAYHANDLER.isEmpty()) {
-                log.warn("No array handler found, please add array handler first.");
-                return output;
-            }
-            result = new HashSet();
-            for (Function&lt;List, List&gt; handler : ARRAYHANDLER) {
-                 result.addAll(handler.apply(output));
-            }
-        }
-        return new ArrayList&lt;&gt;(result);
-    }
-</code></pre>
-<blockquote>
-<p>代理模式(以Jdk代理为例【jdk代理需要类实现接口】)，反射获取对象以及方法的执行</p>
-</blockquote>
-<pre><code> public static void main(String[] args) {
-        Demo helloWorld = new HelloWorldImpl();
-        Demo proxy = new JDKProxyDemo(helloWorld).getProxy(Demo.class);
-        String s = proxy.sayHello("world");
-        System.out.println();
-    }
-
-    static class JDKProxyDemo implements InvocationHandler {
-        private Demo demo;
-        public JDKProxyDemo(Demo demo) {
-            this.demo = demo;
-        }
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            System.out.println("JDKProxyDemo invoke");
-            return method.invoke(demo, args);
-        }
-
-        public &lt;T&gt;  T getProxy(Class&lt;T&gt; clazz){
-            return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, this);
-        }
-    }
-</code></pre>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-03T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[IntelliJ IDEA maven plugin build 失败 Process finished with exit code -1073741819 (0xC0000005)]]></title>
-        <id>https://sanswl.github.io//posts/f6f5e263-ddf6/</id>
-        <link href="https://sanswl.github.io//posts/f6f5e263-ddf6/"/>
-        <updated>2024-12-06T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Help | Find Action or Idea全局搜索:双shift 输入registry打开，寻找注册表中debugger.att...]]></summary>
-        <content type="html"><![CDATA[<ol>
-<li>
-<p><code>Help | Find Action</code> or <code>Idea全局搜索:双shift </code>
-<img src="https://img2024.cnblogs.com/blog/3426265/202412/3426265-20241206190713167-1373741840.png" alt="" /></p>
-</li>
-<li>
-<p>输入registry打开，寻找注册表中<code>debugger.attch.to.process.action</code>，默认处于开启状态，将其关闭即可。
-<img src="https://img2024.cnblogs.com/blog/3426265/202412/3426265-20241206191050756-938598207.png" alt="" /></p>
-</li>
-<li>
-<p>清除缓存，重启即可</p>
-</li>
-</ol>
-<blockquote>
-<p>参考链接：https://youtrack.jetbrains.com/issue/IDEA-203172.</p>
-</blockquote>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2024-12-06T00:00:00.000Z</published>
     </entry>
 </feed>
