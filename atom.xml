@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//</id>
     <title>SANSWL's BLOG</title>
-    <updated>2025-09-22T12:24:16.095Z</updated>
+    <updated>2025-09-24T11:27:30.984Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -531,6 +531,743 @@ Raft 使用 强制覆盖策略 解决：</li>
 <li><a href="https://eli.thegreenplace.net/2020/implementing-raft-part-0-introduction/">Implementing Raft</a></li>
 <li><a href="https://xie.infoq.cn/article/7e0d7c2c5bdd8c8ba150194b3">实战从零开始实现 Raft｜得物技术</a></li>
 </ul>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-09-20T00:00:00.000Z</published>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[利用AI快速阅读框架源码]]></title>
+        <id>https://sanswl.github.io//posts/trae-readsourcecode/</id>
+        <link href="https://sanswl.github.io//posts/trae-readsourcecode/"/>
+        <updated>2025-09-20T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[本文将介绍如何利用AI快速阅读框架源码。推荐使用cursor 、 Trae 这些agentIDE进行操作，因为它们可以快速阅读理解上下文，并...]]></summary>
+        <content type="html"><![CDATA[<h3>1. 介绍</h3>
+<p>本文将介绍如何利用AI快速阅读框架源码。推荐使用<code>cursor</code> 、 <code>Trae</code> 这些<code>agentIDE</code>进行操作，因为它们可以快速阅读理解上下文，并提供关键代码块信息。</p>
+<h3>2. 准备工作</h3>
+<blockquote>
+<p>下载你希望阅读的源码，如利用<code>git</code>等，下载到本地后，使用IDE打开文件夹。接下来步骤以 <code>Trae</code> 为例进行<code>Spring boot</code>源码的阅读。</p>
+</blockquote>
+<p>:::note[注意：]
+提问时，最好预估输出内容，限定读取范围，避免过多信息干扰，以及超出<code>token</code>输出范围。
+:::</p>
+<h5>2.1 提问</h5>
+<ul>
+<li>举例说明</li>
+</ul>
+<blockquote>
+<p>只专注于/core/spring-boot/下的内容，给出springboot嵌入项目是如何读取标记 @Component 注解的class并放入IOC容器的，给出读取的代码块和注册到IOC的代码块</p>
+</blockquote>
+<p>:::fold[AI 输出]
+用户想了解Spring Boot项目中如何读取标记了@Component的类并将其放入IOC容器的过程。我需要查找相关代码。用户特别要求关注<code>/core/spring-boot/</code>目录下的内容。</p>
+<p>我需要查看以下几个方面：</p>
+<p>组件扫描相关的代码
+Bean注册到IOC容器的代码
+让我先搜索一下与组件扫描和Bean注册相关的代码。</p>
+<p>我需要搜索Spring Boot项目中与组件扫描和Bean注册相关的代码，特别是在/core/spring-boot/目录下，看看它是如何读取标记了@Component的类并放入IOC容器的。</p>
+<p>在工作区搜索 'component scan bean register IOC'
+我需要更专注地搜索Spring Boot核心中处理@Component注解的主要代码。先查看Spring Boot的主配置注解@SpringBootApplication，了解它是如何配置组件扫描的。</p>
+<p>在工作区搜索 '@SpringBootApplication'
+搜索结果显示SpringBootConfiguration与SpringBootApplication相关，我需要查看SpringBootApplication注解的具体定义，了解它如何配置组件扫描。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\SpringBootApplication.java
+1-100
+SpringBootApplication.java文件不存在，让我搜索SpringBootApplication的定义位置。</p>
+<p>在工作区搜索 'public @interface SpringBootApplication'
+SpringBootApplication注解似乎不在core/spring-boot目录下。让我在整个项目中搜索它的定义。</p>
+<p>在工作区搜索 'public @interface SpringBootApplication'
+找到了SpringBootApplication注解在core/spring-boot-autoconfigure目录下，我需要查看它的具体定义和组件扫描相关的配置。</p>
+<p>core\spring-boot-autoconfigure\src\main\java\org\springframework\boot\autoconfigure\SpringBootApplication.java
+1-100
+现在我找到了SpringBootApplication注解，它包含了@ComponentScan注解，这是处理组件扫描的关键。让我搜索ClassPathScanningCandidateComponentProvider，因为这是Spring用于扫描组件的核心类。</p>
+<p>在工作区搜索 'ClassPathScanningCandidateComponentProvider'
+根据搜索结果，我找到了ClassPathScanningCandidateComponentProvider的使用情况，但我需要更具体地查找Spring Boot如何处理@Component注解并将其注册到IOC容器的代码。让我搜索ClassPathBeanDefinitionScanner，因为它是专门用于扫描和注册bean的。</p>
+<p>在工作区搜索 'ClassPathBeanDefinitionScanner registerBeanDefinition'
+我需要更直接地搜索Spring Boot中处理@Component注解的核心代码。让我搜索ClassPathBeanDefinitionScanner，这是Spring中专门用于扫描和注册带注解类的关键类。</p>
+<p>在工作区搜索 'ClassPathBeanDefinitionScanner'
+我找到了几个使用ClassPathBeanDefinitionScanner的关键文件，包括BeanDefinitionLoader.java、SpringApplication.java和AnnotationConfigServletWebApplicationContext.java。我应该查看BeanDefinitionLoader.java，因为它可能包含了扫描和加载带有@Component注解类的核心逻辑。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\BeanDefinitionLoader.java
+1-200
+现在我看到了BeanDefinitionLoader的前200行，其中包含了ClassPathBeanDefinitionScanner的初始化和使用。我需要继续查看这个文件的剩余部分，以及SpringApplication如何使用它来处理@Component注解的类。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\BeanDefinitionLoader.java
+201-400
+现在我已经看到了BeanDefinitionLoader的完整代码，它包含了ClassPathBeanDefinitionScanner的初始化和使用逻辑。但是我还需要查看SpringApplication类，了解它如何使用BeanDefinitionLoader来处理@Component注解的类并注册到IOC容器。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\SpringApplication.java
+1-200
+我需要继续查看SpringApplication类中与ApplicationContext创建和Bean加载相关的核心方法，特别是run方法和上下文创建的部分。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\SpringApplication.java
+801-1000
+我需要查看SpringApplication类中的run方法和上下文创建的核心部分，这些是处理组件扫描和Bean注册的关键方法。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\SpringApplication.java
+201-400
+我需要继续查看SpringApplication类中的prepareContext方法和load方法，这些方法应该包含了组件扫描和Bean注册到IOC容器的关键逻辑。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\SpringApplication.java
+381-580
+我需要查看SpringApplication类中load方法的实现，以及BeanDefinitionLoader的具体工作方式，这是Spring Boot读取@Component注解类并注册到IOC容器的核心逻辑。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\SpringApplication.java
+601-800
+core\spring-boot\src\main\java\org\springframework\boot\BeanDefinitionLoader.java
+41-150
+我需要继续查看BeanDefinitionLoader的load方法实现，特别是处理Package类型source的逻辑，这是扫描@Component注解类的核心代码。同时还需要查看ClassPathBeanDefinitionScanner的scan方法。</p>
+<p>core\spring-boot\src\main\java\org\springframework\boot\BeanDefinitionLoader.java
+151-250
+core\spring-boot\src\main\java\org\springframework\boot\BeanDefinitionLoader.java
+251-336
+Spring Boot如何读取@Component类并注册到IOC容器
+核心流程概述
+Spring Boot通过一系列组件协作来扫描、发现和注册带有@Component注解(及派生注解如@Service、@Controller等)的类到IOC容器。下面是核心流程和关键代码块。</p>
+<ol>
+<li>Spring Boot应用入口与上下文准备
+SpringApplication.java</li>
+</ol>
+<pre><code>// Spring Boot应用的主要入口点
+public ConfigurableApplicationContext run(String... args) {
+    // ... 前置处理代码 ...
+    ConfigurableApplicationContext context = createApplicationContext();
+    // ... 环境准备代码 ...
+    prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+    // ... 刷新上下文 ...
+    refreshContext(context);
+    // ... 后续处理代码 ...
+    return context;
+}
+
+// 准备上下文环境，包含加载Bean定义的关键逻辑
+private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context,
+        ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
+        ApplicationArguments applicationArguments, Banner printedBanner) {
+    // ... 环境设置和初始化器应用 ...
+    if (!AotDetector.useGeneratedArtifacts()) {
+        // 加载Bean源
+        Set&lt;Object&gt; sources = getAllSources();
+        Assert.state(!ObjectUtils.isEmpty(sources), "No sources defined");
+        load(context, sources.toArray(new Object[0]));
+    }
+    listeners.contextLoaded(context);
+}
+</code></pre>
+<ol>
+<li>Bean加载机制</li>
+</ol>
+<pre><code>// 将Bean源加载到ApplicationContext
+protected void load(ApplicationContext context, Object[] sources) {
+    if (logger.isDebugEnabled()) {
+        logger.debug("Loading source " + StringUtils.arrayToCommaDelimitedString(sources));
+    }
+    // 创建BeanDefinitionLoader实例
+    BeanDefinitionLoader loader = createBeanDefinitionLoader(getBeanDefinitionRegistry(context), sources);
+    if (this.beanNameGenerator != null) {
+        loader.setBeanNameGenerator(this.beanNameGenerator);
+    }
+    if (this.resourceLoader != null) {
+        loader.setResourceLoader(this.resourceLoader);
+    }
+    if (this.environment != null) {
+        loader.setEnvironment(this.environment);
+    }
+    // 执行加载操作
+    loader.load();
+}
+</code></pre>
+<ol>
+<li>BeanDefinitionLoader的核心实现
+BeanDefinitionLoader.java</li>
+</ol>
+<pre><code>// BeanDefinitionLoader构造函数，初始化扫描器和读取器
+BeanDefinitionLoader(BeanDefinitionRegistry registry, Object... sources) {
+    Assert.notNull(registry, "'registry' must not be null");
+    Assert.notEmpty(sources, "'sources' must not be empty");
+    this.sources = sources;
+    this.annotatedReader = new AnnotatedBeanDefinitionReader(registry);
+    this.xmlReader = new XmlBeanDefinitionReader(registry);
+    this.groovyReader = isGroovyPresent() ? new GroovyBeanDefinitionReader(registry) : null;
+    // 创建ClassPathBeanDefinitionScanner，用于扫描@Component注解类
+    this.scanner = new ClassPathBeanDefinitionScanner(registry);
+    this.scanner.addExcludeFilter(new ClassExcludeFilter(sources));
+}
+
+// 加载所有Bean源
+void load() {
+    for (Object source : this.sources) {
+        load(source);
+    }
+}
+
+// 处理Package类型的源，执行包扫描
+private void load(Package source) {
+    // 调用扫描器扫描指定包
+    this.scanner.scan(source.getName());
+}
+</code></pre>
+<ol>
+<li>ClassPathBeanDefinitionScanner扫描与注册过程
+虽然ClassPathBeanDefinitionScanner的具体实现在Spring Framework核心包中，但从BeanDefinitionLoader的使用可以看出，扫描过程如下：</li>
+</ol>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+扫描阶段：ClassPathBeanDefinitionScanner会扫描指定包及其子包下的所有类文件</li>
+<li>
+<ol>
+<li></li>
+</ol>
+过滤阶段：通过注解过滤器识别带有@Component及其派生注解的类</li>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>注册阶段：将符合条件的类转换为BeanDefinition并注册到BeanDefinitionRegistry</p>
+<p>工作流程图解
+Spring Boot扫描和注册@Component类的整体流程可以概括为：</p>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>SpringApplication.run() → 创建ApplicationContext</p>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>prepareContext() → 准备上下文环境</p>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>load() → 创建BeanDefinitionLoader并调用其load方法</p>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>BeanDefinitionLoader.load() → 遍历处理所有Bean源</p>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>load(Package) → 调用ClassPathBeanDefinitionScanner执行包扫描</p>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>scanner.scan() → 扫描@Component注解类并注册到BeanDefinitionRegistry</p>
+<ul>
+<li>
+<ol>
+<li></li>
+</ol>
+</li>
+</ul>
+<p>ApplicationContext.refresh() → 实例化注册的Bean</p>
+<p>总结
+Spring Boot通过ClassPathBeanDefinitionScanner实现了对带有@Component注解类的自动发现和注册。整个过程是从SpringApplication.run()方法开始，经过上下文准备、Bean源加载、包扫描，最终将组件注册到IOC容器中。这使得开发者只需在类上添加适当的注解，Spring Boot就能自动将其纳入IOC容器管理，大大简化了配置工作。</p>
+<p>:::</p>
+<h4>2.2 提出功能要求</h4>
+<blockquote>
+<p>通过提问具体的功能模块和整体架构是可以快速了解项目的构成和大致运行逻辑。当你有了大概的逻辑概念后，你可能会希望对项目进行深入的分析，可以采用<code>debug</code>了解代码的运行流程，或者通过注入一个钩子函数去跟踪代码的执行流程。</p>
+</blockquote>
+<ul>
+<li>举例说明</li>
+</ul>
+<blockquote>
+<p>如果我想为所有bean 增加钩子监听它们从读取到注入到ioc花费的时间需要如何做？</p>
+</blockquote>
+<blockquote>
+<p>这个需求对于项目启动优化是一个很好的切入点，因为启动时间是影响项目性能的重要因素，除开时间你也可以增加一些其他的监控指标，比如IOC容器的堆栈占用、CPU使用率等。</p>
+</blockquote>
+<p>:::fold[AI 输出]</p>
+<h4>为所有Bean增加生命周期计时钩子实现方案</h4>
+<h6>实现思路</h6>
+<p>要监控Spring Boot中所有Bean从读取到注入到IOC容器的时间，可以结合使用以下Spring扩展点：</p>
+<ol>
+<li>
+<ol>
+<li></li>
+</ol>
+BeanFactoryPostProcessor ：监控Bean定义加载阶段</li>
+<li>
+<ol>
+<li></li>
+</ol>
+BeanPostProcessor ：监控Bean实例化和初始化阶段</li>
+<li>
+<ol>
+<li></li>
+</ol>
+SmartInitializingSingleton ：监控所有单例Bean初始化完成后的阶段</li>
+</ol>
+<h6>具体实现</h6>
+<ol>
+<li>创建Bean生命周期监控器</li>
+</ol>
+<pre><code>package org.springframework.boot.custom;
+
+import org.springframework.util.StopWatch;
+
+/**
+ * Bean生命周期时间监控器，用于存储和计算Bean各个生命周期阶段的时间
+ */
+public class BeanLifecycleMonitor {
+    private final String beanName;
+    private final Class&lt;?&gt; beanType;
+    private long definitionLoadTime;
+    private long instantiationStartTime;
+    private long instantiationEndTime;
+    private long initializationStartTime;
+    private long initializationEndTime;
+    private long injectionCompleteTime;
+
+    public BeanLifecycleMonitor(String beanName, Class&lt;?&gt; beanType) {
+        this.beanName = beanName;
+        this.beanType = beanType;
+    }
+
+    public void recordDefinitionLoadTime() {
+        this.definitionLoadTime = System.currentTimeMillis();
+    }
+
+    public void recordInstantiationStart() {
+        this.instantiationStartTime = System.currentTimeMillis();
+    }
+
+    public void recordInstantiationEnd() {
+        this.instantiationEndTime = System.currentTimeMillis();
+    }
+
+    public void recordInitializationStart() {
+        this.initializationStartTime = System.currentTimeMillis();
+    }
+
+    public void recordInitializationEnd() {
+        this.initializationEndTime = System.currentTimeMillis();
+    }
+
+    public void recordInjectionComplete() {
+        this.injectionCompleteTime = System.currentTimeMillis();
+    }
+
+    public long getTotalTimeFromDefinitionToInjection() {
+        if (injectionCompleteTime &gt; 0 &amp;&amp; definitionLoadTime &gt; 0) {
+            return injectionCompleteTime - definitionLoadTime;
+        }
+        return -1;
+    }
+
+    public long getInstantiationTime() {
+        if (instantiationEndTime &gt; 0 &amp;&amp; instantiationStartTime &gt; 0) {
+            return instantiationEndTime - instantiationStartTime;
+        }
+        return -1;
+    }
+
+    public long getInitializationTime() {
+        if (initializationEndTime &gt; 0 &amp;&amp; initializationStartTime &gt; 0) {
+            return initializationEndTime - initializationStartTime;
+        }
+        return -1;
+    }
+
+    @Override
+    public String toString() {
+        StopWatch stopWatch = new StopWatch(beanName);
+        if (getTotalTimeFromDefinitionToInjection() &gt; 0) {
+            stopWatch.setTotalTimeMillis(getTotalTimeFromDefinitionToInjection());
+        }
+        if (getInstantiationTime() &gt; 0) {
+            stopWatch.registerTask("实例化", getInstantiationTime());
+        }
+        if (getInitializationTime() &gt; 0) {
+            stopWatch.registerTask("初始化", getInitializationTime());
+        }
+        return String.format("Bean '%s' (%s) 生命周期时间：%s", 
+                beanName, beanType.getSimpleName(), stopWatch.prettyPrint());
+    }
+}
+</code></pre>
+<ol>
+<li>创建生命周期计时钩子处理器</li>
+</ol>
+<pre><code>package org.springframework.boot.custom;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Bean生命周期计时钩子处理器，监控所有Bean从定义到注入的全过程
+ */
+@Component
+public class LifecycleTimingPostProcessor implements BeanFactoryPostProcessor, BeanPostProcessor {
+    
+    private final Map&lt;String, BeanLifecycleMonitor&gt; beanMonitors = new ConcurrentHashMap&lt;&gt;();
+    private ConfigurableListableBeanFactory beanFactory;
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+        
+        // 监控Bean定义加载时间
+        if (beanFactory instanceof DefaultListableBeanFactory) {
+            DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) beanFactory;
+            String[] beanDefinitionNames = defaultListableBeanFactory.getBeanDefinitionNames();
+            
+            for (String beanName : beanDefinitionNames) {
+                BeanDefinition beanDefinition = defaultListableBeanFactory.getBeanDefinition(beanName);
+                if (beanDefinition instanceof AbstractBeanDefinition) {
+                    try {
+                        // 获取Bean类型
+                        Class&lt;?&gt; beanType = ClassUtils.forName(beanDefinition.getBeanClassName(), 
+                                beanFactory.getClassLoader());
+                        BeanLifecycleMonitor monitor = new BeanLifecycleMonitor(beanName, beanType);
+                        monitor.recordDefinitionLoadTime();
+                        beanMonitors.put(beanName, monitor);
+                    } catch (ClassNotFoundException e) {
+                        // 忽略无法加载的类
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        BeanLifecycleMonitor monitor = getOrCreateMonitor(beanName, bean.getClass());
+        monitor.recordInitializationStart();
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        BeanLifecycleMonitor monitor = getOrCreateMonitor(beanName, bean.getClass());
+        monitor.recordInitializationEnd();
+        monitor.recordInjectionComplete();
+        
+        // 打印Bean生命周期时间信息
+        System.out.println(monitor);
+        
+        return bean;
+    }
+
+    private BeanLifecycleMonitor getOrCreateMonitor(String beanName, Class&lt;?&gt; beanType) {
+        return beanMonitors.computeIfAbsent(beanName, name -&gt; {
+            BeanLifecycleMonitor monitor = new BeanLifecycleMonitor(name, beanType);
+            monitor.recordDefinitionLoadTime(); // 如果之前没记录，现在记录
+            return monitor;
+        });
+    }
+
+    /**
+     * 获取所有Bean的生命周期时间统计信息
+     */
+    public Map&lt;String, BeanLifecycleMonitor&gt; getAllBeanMonitors() {
+        return new HashMap&lt;&gt;(beanMonitors);
+    }
+}
+</code></pre>
+<ol>
+<li>创建一个监听器来汇总所有Bean的生命周期信息</li>
+</ol>
+<pre><code>package org.springframework.boot.custom;
+
+import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Bean生命周期汇总报告生成器，在所有单例Bean初始化完成后生成汇总报告
+ */
+@Component
+public class BeanLifecycleSummaryReporter implements SmartInitializingSingleton {
+
+    private final LifecycleTimingPostProcessor lifecycleTimingPostProcessor;
+
+    public BeanLifecycleSummaryReporter(LifecycleTimingPostProcessor lifecycleTimingPostProcessor) {
+        this.lifecycleTimingPostProcessor = lifecycleTimingPostProcessor;
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        // 所有单例Bean初始化完成后，生成汇总报告
+        Map&lt;String, BeanLifecycleMonitor&gt; allMonitors = lifecycleTimingPostProcessor.getAllBeanMonitors();
+        
+        // 按耗时排序，找出耗时最长的10个Bean
+        Map&lt;String, BeanLifecycleMonitor&gt; topTimeConsumingBeans = allMonitors.entrySet().stream()
+                .filter(entry -&gt; entry.getValue().getTotalTimeFromDefinitionToInjection() &gt; 0)
+                .sorted(Map.Entry.&lt;String, BeanLifecycleMonitor&gt;
+                        comparingLong(entry -&gt; entry.getValue().getTotalTimeFromDefinitionToInjection()).reversed())
+                .limit(10)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -&gt; e1,
+                        LinkedHashMap::new
+                ));
+        
+        // 打印汇总报告
+        System.out.println("\n=== Bean 生命周期时间汇总报告 ===");
+        System.out.println("总共监控的Bean数量: " + allMonitors.size());
+        System.out.println("\n耗时最长的10个Bean：");
+        
+        int index = 1;
+        for (Map.Entry&lt;String, BeanLifecycleMonitor&gt; entry : topTimeConsumingBeans.entrySet()) {
+            System.out.println(index + ". " + entry.getValue());
+            index++;
+        }
+        
+        System.out.println("=== 汇总报告结束 ===\n");
+    }
+}
+</code></pre>
+<p>:::</p>
+<h3>3. 扩展</h3>
+<blockquote>
+<p>除了阅读框架源码外，你也可以尝试fork github上的开源项目，先利用AI 快速了解项目的构成和大致运行逻辑，然后再深入分析代码，提出功能要求，最后实现相应功能。&lt;br&gt;
+练手可以选择 <code>Git hub</code> 上功能简单，代码量小，以及<code>readme.md</code>内容充足的项目，进行二开。譬如博客项目。</p>
+</blockquote>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-09-20T00:00:00.000Z</published>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[如何使用API调用comfyUI工作流]]></title>
+        <id>https://sanswl.github.io//posts/comfyui-api-invoke/</id>
+        <link href="https://sanswl.github.io//posts/comfyui-api-invoke/"/>
+        <updated>2025-09-20T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[本地安装了ComfyUI软件，并启动。确认端口信息，如下面代码块寻找启动入口，保证连通。API 接口参数信息，可使用图1.1导出API 或...]]></summary>
+        <content type="html"><![CDATA[<h3>1. 前置条件</h3>
+<blockquote>
+<ol>
+<li>本地安装了ComfyUI软件，并启动。</li>
+<li>确认端口信息，如下面代码块寻找启动入口，保证连通。</li>
+<li>API 接口参数信息，可使用<code>图1.1</code>导出API 或 web socket 调用</li>
+</ol>
+</blockquote>
+<p>:::fold[ 启动入口 ]</p>
+<pre><code>def start_comfyui(asyncio_loop=None):
+    """
+    Starts the ComfyUI server using the provided asyncio event loop or creates a new one.
+    Returns the event loop, server instance, and a function to start the server asynchronously.
+    """
+    if args.temp_directory:
+        temp_dir = os.path.join(os.path.abspath(args.temp_directory), "temp")
+        logging.info(f"Setting temp directory to: {temp_dir}")
+        folder_paths.set_temp_directory(temp_dir)
+    cleanup_temp()
+
+    if args.windows_standalone_build:
+        try:
+            import new_updater
+            new_updater.update_windows_updater()
+        except:
+            pass
+
+    if not asyncio_loop:
+        asyncio_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(asyncio_loop)
+    prompt_server = server.PromptServer(asyncio_loop)
+
+    hook_breaker_ac10a0.save_functions()
+    asyncio_loop.run_until_complete(nodes.init_extra_nodes(
+        init_custom_nodes=(not args.disable_all_custom_nodes) or len(args.whitelist_custom_nodes) &gt; 0,
+        init_api_nodes=not args.disable_api_nodes
+    ))
+    hook_breaker_ac10a0.restore_functions()
+
+    cuda_malloc_warning()
+    setup_database()
+
+    prompt_server.add_routes()
+    hijack_progress(prompt_server)
+
+    threading.Thread(target=prompt_worker, daemon=True, args=(prompt_server.prompt_queue, prompt_server,)).start()
+
+    if args.quick_test_for_ci:
+        exit(0)
+
+    os.makedirs(folder_paths.get_temp_directory(), exist_ok=True)
+    call_on_start = None
+    if args.auto_launch:
+        def startup_server(scheme, address, port):
+            import webbrowser
+            if os.name == 'nt' and address == '0.0.0.0':
+                address = '127.0.0.1'
+            if ':' in address:
+                address = "[{}]".format(address)
+            webbrowser.open(f"{scheme}://{address}:{port}")
+        call_on_start = startup_server
+
+    async def start_all():
+        await prompt_server.setup()
+        await run(prompt_server, address=args.listen, port=args.port, verbose=not args.dont_print_server, call_on_start=call_on_start)
+
+    # Returning these so that other code can integrate with the ComfyUI loop and server
+    return asyncio_loop, prompt_server, start_all
+
+# RUN , 默认端口号，另查看日志具体端口号，curl 测试连通性
+async def run(server_instance, address='', port=8188, verbose=True, call_on_start=None):
+    addresses = []
+    for addr in address.split(","):
+        addresses.append((addr, port))
+    await asyncio.gather(
+        server_instance.start_multi_address(addresses, call_on_start, verbose), server_instance.publish_loop()
+    )
+
+</code></pre>
+<p>:::</p>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250924144753830-2038147523.png" alt="图 1.1 " /></p>
+<p>:::fold[ 导出 API 接口参数信息 ]</p>
+<pre><code>// 导出的 API 接口参数信息
+{
+  "1": {
+    "inputs": {
+      "seed": 117705328545051,
+      "steps": 30,
+      "cfg": 7,
+      "sampler_name": "euler_ancestral",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "52",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "4",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "2": {
+    "inputs": {
+      "ckpt_name": "SD1.5\\relastic\\dreamshaper_8.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器（简易）"
+    }
+  },
+  "3": {
+    "inputs": {
+      "text": "beautiful japanese woman in a business red dress, slender, standing in a japanese bar",
+      "clip": [
+        "50",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码"
+    }
+  },
+  "4": {
+    "inputs": {
+      "text": "ugly, deformed, embedding:bad-artist, embedding:bad-hands-5, ",
+      "clip": [
+        "50",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码"
+    }
+  }
+  ......
+}
+</code></pre>
+<p>:::</p>
+<h3>2. 参考实现</h3>
+<p><a href="https://github.com/comfyanonymous/ComfyUI/blob/master/script_examples/basic_api_example.py">官网 Git Hub 参考脚本</a></p>
+<p>:::fold[ 参考 Python 代码 ]</p>
+<pre><code>def run_comfyui_workflow(workflow_path, params):
+    # 加载并修改工作流
+    with open(workflow_path, "r", encoding="utf-8") as f:
+        workflow = json.load(f)
+
+    # 动态替换参数（示例）
+    workflow["3"]["inputs"]["text"] = params["prompt_text"]
+
+    # 提交工作流
+    response = requests.post("http://localhost:8000/prompt", json={"prompt": workflow})
+    prompt_id = response.json()["prompt_id"]
+
+    # 等待执行完成
+    while True:
+        history_response = requests.get("http://localhost:8000/history")
+        history = history_response.json()
+        # 正确访问层级结构
+        current_task = history.get(prompt_id, {})
+        status_info = current_task.get("status", {})
+        if status_info.get("completed") == True:
+            break
+        time.sleep(1)
+    print("Workflow execution completed.")
+    # 提取输出结果
+    # outputs = result["outputs"]
+    # images = []
+    # for node_id in outputs:
+    #     if "images" in outputs[node_id]:
+    #         for img in outputs[node_id]["images"]:
+    #             images.append(img["filename"])
+    #
+    # return images
+</code></pre>
+<p>:::</p>
+<h3>3. 更多接口调用</h3>
+<blockquote>
+<p><code>comfyui server.py</code> 提供了丰富的接口,如图<code>1.2</code> 展示了部分接口。</p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250924160115802-1424074.png" alt="图 1.2 " /></p>
+<p><a href="https://opendeep.wiki/comfyanonymous/ComfyUI/rest-api">API 接口文档</a></p>
 ]]></content>
         <author>
             <name>SANSWL</name>
@@ -1892,41 +2629,6 @@ pause &gt;nul
         <published>2025-03-11T00:00:00.000Z</published>
     </entry>
     <entry>
-        <title type="html"><![CDATA[MVCC 版本并发控制]]></title>
-        <id>https://sanswl.github.io//posts/b90d6666-487a/</id>
-        <link href="https://sanswl.github.io//posts/b90d6666-487a/"/>
-        <updated>2025-03-11T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[必须是支持ACID的存储引擎，譬如Mysql的InnoDB <br> Mysql中mvcc的实现是利用undolog日志和 事务id 以及...]]></summary>
-        <content type="html"><![CDATA[<h1>一 MVCC前提</h1>
-<blockquote>
-<p>必须是支持<code>ACID</code>的存储引擎，譬如Mysql的<code>InnoDB</code>  &lt;br&gt;
-Mysql中mvcc的实现是利用<code>undolog</code>日志和 <code>事务id</code> 以及 <code>ReadView</code>实现； &lt;br&gt;
-<code>ReadView（视图）</code>主要实现的完成事务间的数据可见性 &lt;br&gt;
-Mysql维护着redolog 、binlog、undolog三种日志：
-&lt;a href="https://blog.csdn.net/Weixiaohuai/article/details/117896523" name="redolog"&gt;redolog&lt;/a&gt;：用于数据库异常宕机的恢复工作；innodb存储引擎特有的；物理层；循环覆写 &lt;br&gt;
-&lt;a href="https://www.cnblogs.com/Presley-lpc/p/9619571.html" name="redolog"&gt;binlog&lt;/a&gt;: server共有、逻辑层；备份；追加写入append (需要配置文件开启默认关闭，每次重启都会创建新的binlog，且目录会创建mysql-binlog.index文件，内容为binlog文件名，会先从第一行读取，若第一行空会导致报错)&lt;br&gt;
-&lt;a href="https://zhuanlan.zhihu.com/p/383824552" name="redolog"&gt;undolog&lt;/a&gt; : 用于事务回滚，意为撤销或取消，以撤销操作为目的，将数据返回到某个状态的操作，实现事务的原子性</p>
-</blockquote>
-<h1>二 操作逻辑</h1>
-<blockquote>
-<p>利用Undolog文件中的回滚指针进行数据的回退,利用事务id和ReadView实现事务间的可见性 &lt;br&gt;
-二级索引可通过回表操作实现MVCC，另二级索引维护了自己最后操作的事务id <code>MAX_TRX_ID</code>,再通过 ReadView 中活跃事务id判断可见性；&lt;br&gt;
-DB_TRX_ID：记录最后一次修改该行的事务 ID。&lt;br&gt;
-DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&lt;br&gt;</p>
-</blockquote>
-<h1>三 视图可见性</h1>
-<blockquote>
-<p>视图依据创建时间维护一组活跃的事务ids，和视图创建范围的事务id，包含生成此视图后下一个生成的事务id和生成视图前活跃事务的最小id，利用事务id关系完成可见性判断</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311160745728-1401991784.png" alt="" /></p>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-11T00:00:00.000Z</published>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[Eureka服务注册发现源码流程简析]]></title>
         <id>https://sanswl.github.io//posts/f14c8695-a3e9/</id>
         <link href="https://sanswl.github.io//posts/f14c8695-a3e9/"/>
@@ -2131,6 +2833,41 @@ public interface ApiService {
 等价于 new httpclient(eurekaClient) =&gt; 发送 /index 接口并接受到response
 */
 </code></pre>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-03-11T00:00:00.000Z</published>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[MVCC 版本并发控制]]></title>
+        <id>https://sanswl.github.io//posts/b90d6666-487a/</id>
+        <link href="https://sanswl.github.io//posts/b90d6666-487a/"/>
+        <updated>2025-03-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[必须是支持ACID的存储引擎，譬如Mysql的InnoDB <br> Mysql中mvcc的实现是利用undolog日志和 事务id 以及...]]></summary>
+        <content type="html"><![CDATA[<h1>一 MVCC前提</h1>
+<blockquote>
+<p>必须是支持<code>ACID</code>的存储引擎，譬如Mysql的<code>InnoDB</code>  &lt;br&gt;
+Mysql中mvcc的实现是利用<code>undolog</code>日志和 <code>事务id</code> 以及 <code>ReadView</code>实现； &lt;br&gt;
+<code>ReadView（视图）</code>主要实现的完成事务间的数据可见性 &lt;br&gt;
+Mysql维护着redolog 、binlog、undolog三种日志：
+&lt;a href="https://blog.csdn.net/Weixiaohuai/article/details/117896523" name="redolog"&gt;redolog&lt;/a&gt;：用于数据库异常宕机的恢复工作；innodb存储引擎特有的；物理层；循环覆写 &lt;br&gt;
+&lt;a href="https://www.cnblogs.com/Presley-lpc/p/9619571.html" name="redolog"&gt;binlog&lt;/a&gt;: server共有、逻辑层；备份；追加写入append (需要配置文件开启默认关闭，每次重启都会创建新的binlog，且目录会创建mysql-binlog.index文件，内容为binlog文件名，会先从第一行读取，若第一行空会导致报错)&lt;br&gt;
+&lt;a href="https://zhuanlan.zhihu.com/p/383824552" name="redolog"&gt;undolog&lt;/a&gt; : 用于事务回滚，意为撤销或取消，以撤销操作为目的，将数据返回到某个状态的操作，实现事务的原子性</p>
+</blockquote>
+<h1>二 操作逻辑</h1>
+<blockquote>
+<p>利用Undolog文件中的回滚指针进行数据的回退,利用事务id和ReadView实现事务间的可见性 &lt;br&gt;
+二级索引可通过回表操作实现MVCC，另二级索引维护了自己最后操作的事务id <code>MAX_TRX_ID</code>,再通过 ReadView 中活跃事务id判断可见性；&lt;br&gt;
+DB_TRX_ID：记录最后一次修改该行的事务 ID。&lt;br&gt;
+DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&lt;br&gt;</p>
+</blockquote>
+<h1>三 视图可见性</h1>
+<blockquote>
+<p>视图依据创建时间维护一组活跃的事务ids，和视图创建范围的事务id，包含生成此视图后下一个生成的事务id和生成视图前活跃事务的最小id，利用事务id关系完成可见性判断</p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311160745728-1401991784.png" alt="" /></p>
 ]]></content>
         <author>
             <name>SANSWL</name>
@@ -2752,181 +3489,5 @@ static final class LockFreeBitArray {
             <uri>https://sanswl.github.io//</uri>
         </author>
         <published>2025-03-05T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[CNB【腾讯的云原生开发平台】部署 RAGFlow]]></title>
-        <id>https://sanswl.github.io//posts/c3ff95f8-2fac/</id>
-        <link href="https://sanswl.github.io//posts/c3ff95f8-2fac/"/>
-        <updated>2025-03-04T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[为什么使用CNB 具有不错的免费额度使用，每月刷新，平台硬件配置够用8核 16G内存，完全满足常见的AI模型开发环境 练习docker、li...]]></summary>
-        <content type="html"><![CDATA[<p><strong>为什么使用CNB</strong></p>
-<blockquote>
-<p>具有不错的免费额度使用，每月刷新，平台硬件配置够用8核 16G内存，完全满足常见的AI模型开发环境
-练习docker、linux，不再局限于WSL、vm硬件配置不够用，具有WebIDE（Vscode）
-https://docs.cnb.cool/zh/saas/pricing.html 【计费规则】
-https://docs.cnb.cool/zh/vscode/quick-start.html</p>
-</blockquote>
-<p><strong>开始部署</strong></p>
-<blockquote>
-<ol>
-<li>创建一个仓库,开启云平台初始化，使用cnb-init-from <s>https://your-git.com/your-repo.git</s>
-<s>git clone</s> https://github.com/infiniflow/ragflow.git [RAGFlow的GitHub仓库]</li>
-</ol>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250304023728808-769939825.png" alt="" /></p>
-<p><strong>初始化后，使其文件依赖结构如图所示，否则ragflow-server启动将失败</strong>
-<strong>OSError: [Errno loading yaml file config from /ragflow/conf/service_conf.yaml failed:] [Errno 2] No such file or directory: '/ragflow/conf/service_conf.yaml'</strong></p>
-<blockquote>
-<ol>
-<li>Ragflow的部署，待下载完Ragflow（大约9G），进入到上图的ragflow/docker目录下，启动 <code>docker compose -f docker-compose.yml up -d</code>
-使用 <code>docker logs -f ragflow-server</code> 查看是否启动完成</li>
-</ol>
-</blockquote>
-<blockquote>
-<ol>
-<li>https://ragflow.io/docs/dev/ 开始学习</li>
-</ol>
-</blockquote>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-04T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Mqtt学习使用]]></title>
-        <id>https://sanswl.github.io//posts/fbf8bdcc-8f34/</id>
-        <link href="https://sanswl.github.io//posts/fbf8bdcc-8f34/"/>
-        <updated>2025-03-04T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[##1. 依赖导入 //V3 <dependency> <groupId>org.eclipse.paho</groupId> <artif...]]></summary>
-        <content type="html"><![CDATA[<p>##1. 依赖导入</p>
-<pre><code>//V3
-&lt;dependency&gt;
-            &lt;groupId&gt;org.eclipse.paho&lt;/groupId&gt;
-            &lt;artifactId&gt;org.eclipse.paho.client.mqttv3&lt;/artifactId&gt;
-            &lt;version&gt;1.2.0&lt;/version&gt;
-&lt;/dependency&gt;
-// V5
-&lt;dependency&gt;
-            &lt;groupId&gt;org.eclipse.paho&lt;/groupId&gt;
-            &lt;artifactId&gt;org.eclipse.paho.mqttv5.client&lt;/artifactId&gt;
-            &lt;version&gt;1.2.5&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
-<p>##2. 客户端连接</p>
-<pre><code> String broker = "tcp://broker.emqx.io:1883";
-    String clientId = "demo_client";
-    MqttClient client;
-
-    public MqttServerClient()  {
-       try {
-           MqttClient client = new MqttClient(broker, clientId);
-        //MqttAsyncClient aClient = new MqttAsyncClient(broker, clientId); //异步通信客户端
-          MqttConnectOptions options = new MqttConnectOptions();
-        // 连接 MQTT Broker 的用户名密码
-          options.setUserName("username");
-          options.setPassword("password".toCharArray());
-        // 是否清除会话
-          options.setCleanSession(true);
-        // 心跳间隔，单位为秒
-          options.setKeepAliveInterval(300);
-        // 连接超时时间，单位为秒
-          options.setConnectionTimeout(30);
-        // 是否自动重连
-          options.setAutomaticReconnect(true);
-
-           client.connect(options);
-
-           //this.client = client;
-           //init();
-       }catch (MqttException e) {
-           e.printStackTrace();
-       }
-    }
-
-</code></pre>
-<p>##3. 客户端回调V3（V5增加了数个额外实现）</p>
-<pre><code>//方法在 CommsCallback.class  执行回调
-client.setCallback(new MqttCallback() {
-          //消息发送被接收到
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-                System.out.println("topic: " + topic);
-                System.out.println("qos: " + message.getQos());
-                System.out.println("message content: " + new String(message.getPayload()));
-            }
-
-            public void connectionLost(Throwable cause) {
-                System.out.println("connectionLost: " + cause.getMessage());
-            }
-
-            public void deliveryComplete(IMqttDeliveryToken token) {
-                System.out.println("deliveryComplete: " + token.isComplete());
-            }
-        });
-</code></pre>
-<p><strong>注意</strong>：<br />
-<code>1.</code>订阅的clientId 与 发布的clientId 需要保持不同，否则会发生客户端断连问题；
-<code>2.</code> 使用的ClientId 尽可能复杂些，避免连接失败（使用官方提供的broker = "tcp://broker.emqx.io:1883";）</p>
-<p>##4. 订阅Topic</p>
-<pre><code> public void subscribe(String topic) throws MqttException {
-       // qos的数量需要与topic一致，存在方法签名为 public void subscribe(String[] topicFilters, int[] qos) throws MqttException【批量】
-        int qos = 2;
-       client.subscribe(topic, qos);
-//允许插入回调 IMqttMessageListener
-   }
-//走的是异步客户端处理
-	    MqttToken token = new MqttToken(getClientId());
-		token.setActionCallback(callback);
-		token.setUserContext(userContext);
-		token.internalTok.setTopics(topicFilters);
-
-		MqttSubscribe register = new MqttSubscribe(topicFilters, qos);
-
-		comms.sendNoWait(register, token);
-</code></pre>
-<blockquote>
-<p><code>+</code>：单层通配，必须占据一个层级，例如 test/+/aa &lt;===&gt; {test/1/aa,test/abc/aa}、+、test/+
-<code>#</code>：多层通配，必须占用一个层级，且是最后一个字符，例如 test/#  &lt;===&gt; {test/aa，test/aa/bb... } 、test/demo/#、#
-<code>$share/{Share Name}/{Topic Filter}</code>: 共享订阅，{shareName}定义的共享组名，{topicFilter}主题名与publish的一致，例如 $share/test1/demo(sub)、 demo(pub)<br />
-<code>$queue/{Topic File}</code>: MQTT3.1.1
-<strong>负载均衡</strong> EMQX</p>
-</blockquote>
-<pre><code># etc/emqx.conf
-
-# 均衡策略
-broker.shared_subscription_strategy = random
-
-# 当设备离线，或者消息等级为 QoS1、QoS2，因各种各样原因设备没有回复 ACK 确认，消息会被重新派发至群组内其他的设备。
-broker.shared_dispatch_ack_enabled = false
-</code></pre>
-<p>##5. 发布msg</p>
-<pre><code> public void publish(String topic, String msg) throws MqttException {
-       int qos = 1;
-       MqttMessage message = new MqttMessage(msg.getBytes());
-       message.setQos(qos);
-       client.publish(topic, message);
-//允许插入回调 IMqttActionListener
-   }
-//同样走的是异步客户端处理
-		MqttDeliveryToken token = new MqttDeliveryToken(getClientId());
-		token.setActionCallback(callback);
-		token.setUserContext(userContext);
-		token.setMessage(message);
-		token.internalTok.setTopics(new String[] { topic });
-
-		MqttPublish pubMsg = new MqttPublish(topic, message);
-		comms.sendNoWait(pubMsg, token);
-</code></pre>
-<blockquote>
-<p><code>Retain(保留消息)</code> 生产者publish的消息会保存一份最新消息，当订阅此topic后会拿取到这份消息，且消息的retain属性为true，注意必须是后订阅读取到的消息才是保留消息
-<code>Will(遗嘱消息)</code>  在连接到指定Broker前指定，options.setWill()，会创建一个独立的Topic</p>
-</blockquote>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-04T00:00:00.000Z</published>
     </entry>
 </feed>
