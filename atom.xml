@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//</id>
     <title>SANSWL's BLOG</title>
-    <updated>2025-09-24T11:27:30.984Z</updated>
+    <updated>2025-09-25T20:29:39.014Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -13,6 +13,241 @@
     <link rel="self" href="https://sanswl.github.io/atom.xml"/>
     <subtitle>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</subtitle>
     <rights>Copyright © 2025 SANSWL</rights>
+    <entry>
+        <title type="html"><![CDATA[Elasticsearch 使用知识汇总]]></title>
+        <id>https://sanswl.github.io//posts/elasticsearch-usage-read/</id>
+        <link href="https://sanswl.github.io//posts/elasticsearch-usage-read/"/>
+        <updated>2025-09-22T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Elasticsearch 是一个开源的分布式搜索和分析引擎，专为速度、扩展和 AI 应用而打造。作为一个检索平台，它可以实时存储结构化...]]></summary>
+        <content type="html"><![CDATA[<h3>1.简介</h3>
+<blockquote>
+<p>Elasticsearch 是一个开源的分布式搜索和分析引擎，专为速度、扩展和 AI 应用而打造。作为一个检索平台，它可以实时存储结构化、非结构化和向量数据，提供快速的混合和向量搜索，支持可观测性与安全分析，并以高性能、高准确性和高相关性实现 AI 驱动的应用。一个开源的分布式搜索引擎，可以用来实现搜索、日志统计、分析、系统监控等功能。</p>
+</blockquote>
+<blockquote>
+<p>在AI环境下，ES和向量数据库的学习必不可少。目标，掌握ES的基本概念和使用技巧。</p>
+</blockquote>
+<p><a href="https://www.elastic.co/docs">Elasticsearch 官网</a></p>
+<p>:::note[注意！]</p>
+<p>Kibana 使用 edge 打开，有概率<code>Dev Tools</code>无法正常使用，请使用 Chrome 打开。</p>
+<p>:::</p>
+<h3>2. 安装</h3>
+<blockquote>
+<p>以docker 安装为例，较为方便。</p>
+<p><code>curl -fsSL https://elastic.co/start-local | sh</code></p>
+</blockquote>
+<p>:::fold[docker-compose.yml 配置]</p>
+<pre><code>services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_LOCAL_VERSION}
+    container_name: ${ES_LOCAL_CONTAINER_NAME}
+    volumes:
+      - dev-elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 127.0.0.1:${ES_LOCAL_PORT}:9200
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ES_LOCAL_PASSWORD}
+# xpack.security.enabled 需要相应的license
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=trial
+      - xpack.ml.use_auto_machine_memory_percent=true
+      - ES_JAVA_OPTS=-Xms${ES_LOCAL_HEAP_INIT} -Xmx${ES_LOCAL_HEAP_MAX}
+      - cluster.routing.allocation.disk.watermark.low=${ES_LOCAL_DISK_SPACE_REQUIRED}
+      - cluster.routing.allocation.disk.watermark.high=${ES_LOCAL_DISK_SPACE_REQUIRED}
+      - cluster.routing.allocation.disk.watermark.flood_stage=${ES_LOCAL_DISK_SPACE_REQUIRED}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --output /dev/null --silent --head --fail -u elastic:${ES_LOCAL_PASSWORD} http://elasticsearch:9200",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+  kibana_settings:
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_LOCAL_VERSION}
+    container_name: ${KIBANA_LOCAL_SETTINGS_CONTAINER_NAME}
+    restart: 'no'
+    command: &gt;
+      bash -c '
+        echo "Setup the kibana_system password";
+        start_time=$$(date +%s);
+        timeout=60;
+        until curl -s -u "elastic:${ES_LOCAL_PASSWORD}" -X POST http://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_LOCAL_PASSWORD}\"}" -H "Content-Type: application/json" | grep -q "^{}"; do
+          if [ $$(($$(date +%s) - $$start_time)) -ge $$timeout ]; then
+            echo "Error: Elasticsearch timeout";
+            exit 1;
+          fi;
+          sleep 2;
+        done;
+      '
+
+  kibana:
+    depends_on:
+      kibana_settings:
+        condition: service_completed_successfully
+    image: docker.elastic.co/kibana/kibana:${ES_LOCAL_VERSION}
+    container_name: ${KIBANA_LOCAL_CONTAINER_NAME}
+    volumes:
+      - dev-kibana:/usr/share/kibana/data
+      - ./config/telemetry.yml:/usr/share/kibana/config/telemetry.yml
+      - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 127.0.0.1:${KIBANA_LOCAL_PORT}:5601
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_LOCAL_PASSWORD}
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${KIBANA_ENCRYPTION_KEY}
+      - ELASTICSEARCH_PUBLICBASEURL=http://localhost:${ES_LOCAL_PORT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://kibana:5601 | grep -q 'HTTP/1.1 302 Found'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+volumes:
+  dev-elasticsearch:
+  dev-kibana:
+</code></pre>
+<p>:::</p>
+<h3>3. 基本概念</h3>
+<blockquote>
+<p>ES 是基于文档（<strong>Document</strong>）存储，倒排索引进行搜索的。</p>
+<p>倒排索引基本概念：</p>
+<ul>
+<li>文档（<code>Document</code>）：用来搜索的数据，其中的每一条数据就是一个文档。例如一个网页、一个商品信息</li>
+<li>词条（<code>Term</code>）：对文档数据或用户搜索数据，利用某种算法分词，得到的具备含义的词语就是词条。例如：我是中国人，就可以分为：我、是、中国人、中国、国人这样的几个词条</li>
+</ul>
+</blockquote>
+<p><img src="https://sanswl.github.io/_astro/2729274-20230205171751933-576636800.Ckd6_hsj_1U3RGq.webp" alt="" /></p>
+<p><a href="https://www.elastic.co/docs/manage-data/data-store/near-real-time-search">近乎实时的搜索</a></p>
+<h4>3.1 索引（Index）</h4>
+<blockquote>
+<p>ES中的索引是相同文档（<strong>Document</strong>）的数据集合，例如用户信息的文档集合称为用户索引。</p>
+</blockquote>
+<p><a href="https://www.elastic.co/docs/manage-data/data-store/index-basics">Index</a></p>
+<h4>3.2 映射(<strong>Mapping</strong>)</h4>
+<blockquote>
+<p>对ES索引(<strong>Index</strong>)的结构性约束，类似于数据库的表结构。倒排索引结构虽然不复杂，但是一旦数据结构改变（比如改变了分词器），就需要重新创建倒排索引，这简直是灾难。因此索引库一旦创建，无法修改mapping。但是允许增加新的字段。</p>
+</blockquote>
+<p><a href="https://www.elastic.co/docs/manage-data/data-store/mapping">Mapping</a></p>
+<h4>3.3文档(<strong>Document</strong>)</h4>
+<blockquote>
+<p>JSON格式的文本信息，ES的存储单元。</p>
+</blockquote>
+<h4>3.4 分词器(<strong>analyzer</strong>)</h4>
+<blockquote>
+<p>分词器控制倒排索引的生成规则。</p>
+</blockquote>
+<h3>4.操作流程</h3>
+<pre><code>timeline
+    title ES 操作流程
+    Step 0 : connect ES 
+    Step 1 : Create Index
+    Step 2 : dynamic mapping 
+           : explicit mapping 
+    Step 3: Opeartate document 
+    Step 4: Search documents 
+</code></pre>
+<h3>5.  完整示例</h3>
+<p>参考链接：</p>
+<ul>
+<li><a href="https://www.elastic.co/docs/solutions/search/get-started/index-basics#getting-started-requirements">快速入门</a></li>
+<li><a href="https://www.cnblogs.com/buchizicai/p/17093719.html">ElasticSearch (ES从入门到精通一篇就够了)</a></li>
+</ul>
+<h3>6. 相关性算分详解(影响ES输出排序)</h3>
+<blockquote>
+<p>elasticsearch会根据词条和文档的相关度做打分，从而排序，算法有两种：</p>
+<ul>
+<li>TF-IDF算法(缺陷：词条频率越高，文档得分也会越高，单个词条对文档影响较大)</li>
+<li>BM25算法，elasticsearch5.1版本后采用的算法</li>
+</ul>
+</blockquote>
+<p>:::fold[例如搜索：虹桥如家 ]</p>
+<pre><code>[
+  {
+    "_score" : 17.850193,
+    "_source" : {
+      "name" : "虹桥如家酒店真不错",
+    }
+  },
+  {
+    "_score" : 12.259849,
+    "_source" : {
+      "name" : "外滩如家酒店真不错",
+    }
+  },
+  {
+    "_score" : 11.91091,
+    "_source" : {
+      "name" : "迪士尼如家酒店真不错",
+    }
+  }
+]
+
+</code></pre>
+<p>:::</p>
+<p>相似性算法 <code>BM25</code></p>
+<p><a href="https://www.elastic.co/blog/practical-bm25-part-2-the-bm25-algorithm-and-its-variables">https://www.elastic.co/blog/practical-bm25-part-2-the-bm25-algorithm-and-its-variables</a></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/22429884/1756655856733-9d0bdd48-6b8b-43d5-80b0-10aac124a9bb.png" alt="" /></p>
+<p>q&lt;sub&gt;i&lt;/sub&gt;:</p>
+<blockquote>
+<p>eg: "shane" 、"&lt;font style="color:rgba(54, 65, 52, 1);"&gt;shane connelly&lt;/font&gt;"</p>
+<p>q&lt;sub&gt;0  &lt;/sub&gt;："shane"</p>
+<p>q&lt;sub&gt;0&lt;/sub&gt;、q&lt;sub&gt;1 &lt;/sub&gt;："shane" 、“&lt;font style="color:rgba(52, 65, 54, 1);"&gt;connelly&lt;/font&gt;"</p>
+</blockquote>
+<p>IDF(q&lt;sub&gt;i&lt;/sub&gt;)<strong>&lt;font style="color:rgb(52, 55, 65);"&gt;:&lt;/font&gt;</strong></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/22429884/1756659098057-1a588ddd-9ac9-41ee-8717-0b1fd93bfe92.png" alt="" /></p>
+<blockquote>
+<p>doccount： 文档总数</p>
+<p>f（q&lt;sub&gt;i&lt;/sub&gt;）： 搜索的term所占据的文档数，例如，总共4篇文档，"shane"存在每一篇文档中，即f（q&lt;sub&gt;i&lt;/sub&gt;）=4</p>
+</blockquote>
+<p><code>b</code>:</p>
+<blockquote>
+<p>文档长度影响率，默认0.75，0的话文档的长度将不影响相关性</p>
+</blockquote>
+<p>f(q&lt;sub&gt;i&lt;/sub&gt;,D)<strong>&lt;font style="color:rgb(52, 55, 65);"&gt;:&lt;/font&gt;</strong></p>
+<blockquote>
+<p>搜索的term在特定文档中出现的次数，例如doc1中文档内容为"shane"，则为1，doc2中文档内容为"shane shane"，则为2；即出现频率越高值越大</p>
+</blockquote>
+<p>k1&lt;font style="color:rgb(52, 55, 65);"&gt;:&lt;/font&gt;</p>
+<blockquote>
+<p>默认值1.2；K1控制着得分曲线的变化率，越大，曲线变化越陡峭</p>
+</blockquote>
+<h3>7. API调用</h3>
+<blockquote>
+<p>查看<a href="#5--%E5%AE%8C%E6%95%B4%E7%A4%BA%E4%BE%8B">上述链接</a>的API调用规则，这里不再复述，<strong>注意:</strong> 上述文档是基于老版本的，需要注意client和具体API操作方法存在些许改变，但大致流程保持一致。或者浏览官方网站或Spring Data了解对应版本API调用规则。</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/spring-projects/spring-data-examples/blob/main/elasticsearch/example/src/main/java/example/springdata/elasticsearch/conference/ApplicationConfiguration.java">Spring Data Elasticsearch </a></li>
+<li><a href="https://www.elastic.co/docs/api/doc/elasticsearch/">ES 官方API详情</a></li>
+</ul>
+<h3>8. 常见问题和优化项</h3>
+<p><a href="https://www.elastic.co/docs/reference/elasticsearch/index-settings/slow-log">慢日志</a></p>
+<p><a href="https://www.elastic.co/docs/reference/elasticsearch/rest-apis/paginate-search-results">分页问题</a></p>
+<p><a href="https://discuss.elastic.co/t/security-exception-current-license-is-non-compliant-for-security-with-license-expired-feature-security/97351"><strong>security_exception</strong></a></p>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-09-22T00:00:00.000Z</published>
+    </entry>
     <entry>
         <title type="html"><![CDATA[updf使用]]></title>
         <id>https://sanswl.github.io//posts/updf-software/</id>
@@ -113,6 +348,215 @@
 </blockquote>
 <p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250922040434461-71429088.png" alt="更新配置事件" /></p>
 <p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250922035931400-1477783068.png" alt="热更新执行流程" /></p>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-09-20T00:00:00.000Z</published>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[如何使用API调用comfyUI工作流]]></title>
+        <id>https://sanswl.github.io//posts/comfyui-api-invoke/</id>
+        <link href="https://sanswl.github.io//posts/comfyui-api-invoke/"/>
+        <updated>2025-09-20T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[本地安装了ComfyUI软件，并启动。确认端口信息，如下面代码块寻找启动入口，保证连通。API 接口参数信息，可使用图1.1导出API 或...]]></summary>
+        <content type="html"><![CDATA[<h3>1. 前置条件</h3>
+<blockquote>
+<ol>
+<li>本地安装了ComfyUI软件，并启动。</li>
+<li>确认端口信息，如下面代码块寻找启动入口，保证连通。</li>
+<li>API 接口参数信息，可使用<code>图1.1</code>导出API 或 web socket 调用</li>
+</ol>
+</blockquote>
+<p>:::fold[ 启动入口 ]</p>
+<pre><code>def start_comfyui(asyncio_loop=None):
+    """
+    Starts the ComfyUI server using the provided asyncio event loop or creates a new one.
+    Returns the event loop, server instance, and a function to start the server asynchronously.
+    """
+    if args.temp_directory:
+        temp_dir = os.path.join(os.path.abspath(args.temp_directory), "temp")
+        logging.info(f"Setting temp directory to: {temp_dir}")
+        folder_paths.set_temp_directory(temp_dir)
+    cleanup_temp()
+
+    if args.windows_standalone_build:
+        try:
+            import new_updater
+            new_updater.update_windows_updater()
+        except:
+            pass
+
+    if not asyncio_loop:
+        asyncio_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(asyncio_loop)
+    prompt_server = server.PromptServer(asyncio_loop)
+
+    hook_breaker_ac10a0.save_functions()
+    asyncio_loop.run_until_complete(nodes.init_extra_nodes(
+        init_custom_nodes=(not args.disable_all_custom_nodes) or len(args.whitelist_custom_nodes) &gt; 0,
+        init_api_nodes=not args.disable_api_nodes
+    ))
+    hook_breaker_ac10a0.restore_functions()
+
+    cuda_malloc_warning()
+    setup_database()
+
+    prompt_server.add_routes()
+    hijack_progress(prompt_server)
+
+    threading.Thread(target=prompt_worker, daemon=True, args=(prompt_server.prompt_queue, prompt_server,)).start()
+
+    if args.quick_test_for_ci:
+        exit(0)
+
+    os.makedirs(folder_paths.get_temp_directory(), exist_ok=True)
+    call_on_start = None
+    if args.auto_launch:
+        def startup_server(scheme, address, port):
+            import webbrowser
+            if os.name == 'nt' and address == '0.0.0.0':
+                address = '127.0.0.1'
+            if ':' in address:
+                address = "[{}]".format(address)
+            webbrowser.open(f"{scheme}://{address}:{port}")
+        call_on_start = startup_server
+
+    async def start_all():
+        await prompt_server.setup()
+        await run(prompt_server, address=args.listen, port=args.port, verbose=not args.dont_print_server, call_on_start=call_on_start)
+
+    # Returning these so that other code can integrate with the ComfyUI loop and server
+    return asyncio_loop, prompt_server, start_all
+
+# RUN , 默认端口号，另查看日志具体端口号，curl 测试连通性
+async def run(server_instance, address='', port=8188, verbose=True, call_on_start=None):
+    addresses = []
+    for addr in address.split(","):
+        addresses.append((addr, port))
+    await asyncio.gather(
+        server_instance.start_multi_address(addresses, call_on_start, verbose), server_instance.publish_loop()
+    )
+
+</code></pre>
+<p>:::</p>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250924144753830-2038147523.png" alt="图 1.1 " /></p>
+<p>:::fold[ 导出 API 接口参数信息 ]</p>
+<pre><code>// 导出的 API 接口参数信息
+{
+  "1": {
+    "inputs": {
+      "seed": 117705328545051,
+      "steps": 30,
+      "cfg": 7,
+      "sampler_name": "euler_ancestral",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "52",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "4",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "K采样器"
+    }
+  },
+  "2": {
+    "inputs": {
+      "ckpt_name": "SD1.5\\relastic\\dreamshaper_8.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器（简易）"
+    }
+  },
+  "3": {
+    "inputs": {
+      "text": "beautiful japanese woman in a business red dress, slender, standing in a japanese bar",
+      "clip": [
+        "50",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码"
+    }
+  },
+  "4": {
+    "inputs": {
+      "text": "ugly, deformed, embedding:bad-artist, embedding:bad-hands-5, ",
+      "clip": [
+        "50",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP文本编码"
+    }
+  }
+  ......
+}
+</code></pre>
+<p>:::</p>
+<h3>2. 参考实现</h3>
+<p><a href="https://github.com/comfyanonymous/ComfyUI/blob/master/script_examples/basic_api_example.py">官网 Git Hub 参考脚本</a></p>
+<p>:::fold[ 参考 Python 代码 ]</p>
+<pre><code>def run_comfyui_workflow(workflow_path, params):
+    # 加载并修改工作流
+    with open(workflow_path, "r", encoding="utf-8") as f:
+        workflow = json.load(f)
+
+    # 动态替换参数（示例）
+    workflow["3"]["inputs"]["text"] = params["prompt_text"]
+
+    # 提交工作流
+    response = requests.post("http://localhost:8000/prompt", json={"prompt": workflow})
+    prompt_id = response.json()["prompt_id"]
+
+    # 等待执行完成
+    while True:
+        history_response = requests.get("http://localhost:8000/history")
+        history = history_response.json()
+        # 正确访问层级结构
+        current_task = history.get(prompt_id, {})
+        status_info = current_task.get("status", {})
+        if status_info.get("completed") == True:
+            break
+        time.sleep(1)
+    print("Workflow execution completed.")
+    # 提取输出结果
+    # outputs = result["outputs"]
+    # images = []
+    # for node_id in outputs:
+    #     if "images" in outputs[node_id]:
+    #         for img in outputs[node_id]["images"]:
+    #             images.append(img["filename"])
+    #
+    # return images
+</code></pre>
+<p>:::</p>
+<h3>3. 更多接口调用</h3>
+<blockquote>
+<p><code>comfyui server.py</code> 提供了丰富的接口,如图<code>1.2</code> 展示了部分接口。</p>
+</blockquote>
+<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250924160115802-1424074.png" alt="图 1.2 " /></p>
+<p><a href="https://opendeep.wiki/comfyanonymous/ComfyUI/rest-api">API 接口文档</a></p>
 ]]></content>
         <author>
             <name>SANSWL</name>
@@ -1067,215 +1511,6 @@ public class BeanLifecycleSummaryReporter implements SmartInitializingSingleton 
         <published>2025-09-20T00:00:00.000Z</published>
     </entry>
     <entry>
-        <title type="html"><![CDATA[如何使用API调用comfyUI工作流]]></title>
-        <id>https://sanswl.github.io//posts/comfyui-api-invoke/</id>
-        <link href="https://sanswl.github.io//posts/comfyui-api-invoke/"/>
-        <updated>2025-09-20T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[本地安装了ComfyUI软件，并启动。确认端口信息，如下面代码块寻找启动入口，保证连通。API 接口参数信息，可使用图1.1导出API 或...]]></summary>
-        <content type="html"><![CDATA[<h3>1. 前置条件</h3>
-<blockquote>
-<ol>
-<li>本地安装了ComfyUI软件，并启动。</li>
-<li>确认端口信息，如下面代码块寻找启动入口，保证连通。</li>
-<li>API 接口参数信息，可使用<code>图1.1</code>导出API 或 web socket 调用</li>
-</ol>
-</blockquote>
-<p>:::fold[ 启动入口 ]</p>
-<pre><code>def start_comfyui(asyncio_loop=None):
-    """
-    Starts the ComfyUI server using the provided asyncio event loop or creates a new one.
-    Returns the event loop, server instance, and a function to start the server asynchronously.
-    """
-    if args.temp_directory:
-        temp_dir = os.path.join(os.path.abspath(args.temp_directory), "temp")
-        logging.info(f"Setting temp directory to: {temp_dir}")
-        folder_paths.set_temp_directory(temp_dir)
-    cleanup_temp()
-
-    if args.windows_standalone_build:
-        try:
-            import new_updater
-            new_updater.update_windows_updater()
-        except:
-            pass
-
-    if not asyncio_loop:
-        asyncio_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(asyncio_loop)
-    prompt_server = server.PromptServer(asyncio_loop)
-
-    hook_breaker_ac10a0.save_functions()
-    asyncio_loop.run_until_complete(nodes.init_extra_nodes(
-        init_custom_nodes=(not args.disable_all_custom_nodes) or len(args.whitelist_custom_nodes) &gt; 0,
-        init_api_nodes=not args.disable_api_nodes
-    ))
-    hook_breaker_ac10a0.restore_functions()
-
-    cuda_malloc_warning()
-    setup_database()
-
-    prompt_server.add_routes()
-    hijack_progress(prompt_server)
-
-    threading.Thread(target=prompt_worker, daemon=True, args=(prompt_server.prompt_queue, prompt_server,)).start()
-
-    if args.quick_test_for_ci:
-        exit(0)
-
-    os.makedirs(folder_paths.get_temp_directory(), exist_ok=True)
-    call_on_start = None
-    if args.auto_launch:
-        def startup_server(scheme, address, port):
-            import webbrowser
-            if os.name == 'nt' and address == '0.0.0.0':
-                address = '127.0.0.1'
-            if ':' in address:
-                address = "[{}]".format(address)
-            webbrowser.open(f"{scheme}://{address}:{port}")
-        call_on_start = startup_server
-
-    async def start_all():
-        await prompt_server.setup()
-        await run(prompt_server, address=args.listen, port=args.port, verbose=not args.dont_print_server, call_on_start=call_on_start)
-
-    # Returning these so that other code can integrate with the ComfyUI loop and server
-    return asyncio_loop, prompt_server, start_all
-
-# RUN , 默认端口号，另查看日志具体端口号，curl 测试连通性
-async def run(server_instance, address='', port=8188, verbose=True, call_on_start=None):
-    addresses = []
-    for addr in address.split(","):
-        addresses.append((addr, port))
-    await asyncio.gather(
-        server_instance.start_multi_address(addresses, call_on_start, verbose), server_instance.publish_loop()
-    )
-
-</code></pre>
-<p>:::</p>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250924144753830-2038147523.png" alt="图 1.1 " /></p>
-<p>:::fold[ 导出 API 接口参数信息 ]</p>
-<pre><code>// 导出的 API 接口参数信息
-{
-  "1": {
-    "inputs": {
-      "seed": 117705328545051,
-      "steps": 30,
-      "cfg": 7,
-      "sampler_name": "euler_ancestral",
-      "scheduler": "normal",
-      "denoise": 1,
-      "model": [
-        "52",
-        0
-      ],
-      "positive": [
-        "3",
-        0
-      ],
-      "negative": [
-        "4",
-        0
-      ],
-      "latent_image": [
-        "5",
-        0
-      ]
-    },
-    "class_type": "KSampler",
-    "_meta": {
-      "title": "K采样器"
-    }
-  },
-  "2": {
-    "inputs": {
-      "ckpt_name": "SD1.5\\relastic\\dreamshaper_8.safetensors"
-    },
-    "class_type": "CheckpointLoaderSimple",
-    "_meta": {
-      "title": "Checkpoint加载器（简易）"
-    }
-  },
-  "3": {
-    "inputs": {
-      "text": "beautiful japanese woman in a business red dress, slender, standing in a japanese bar",
-      "clip": [
-        "50",
-        0
-      ]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP文本编码"
-    }
-  },
-  "4": {
-    "inputs": {
-      "text": "ugly, deformed, embedding:bad-artist, embedding:bad-hands-5, ",
-      "clip": [
-        "50",
-        0
-      ]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP文本编码"
-    }
-  }
-  ......
-}
-</code></pre>
-<p>:::</p>
-<h3>2. 参考实现</h3>
-<p><a href="https://github.com/comfyanonymous/ComfyUI/blob/master/script_examples/basic_api_example.py">官网 Git Hub 参考脚本</a></p>
-<p>:::fold[ 参考 Python 代码 ]</p>
-<pre><code>def run_comfyui_workflow(workflow_path, params):
-    # 加载并修改工作流
-    with open(workflow_path, "r", encoding="utf-8") as f:
-        workflow = json.load(f)
-
-    # 动态替换参数（示例）
-    workflow["3"]["inputs"]["text"] = params["prompt_text"]
-
-    # 提交工作流
-    response = requests.post("http://localhost:8000/prompt", json={"prompt": workflow})
-    prompt_id = response.json()["prompt_id"]
-
-    # 等待执行完成
-    while True:
-        history_response = requests.get("http://localhost:8000/history")
-        history = history_response.json()
-        # 正确访问层级结构
-        current_task = history.get(prompt_id, {})
-        status_info = current_task.get("status", {})
-        if status_info.get("completed") == True:
-            break
-        time.sleep(1)
-    print("Workflow execution completed.")
-    # 提取输出结果
-    # outputs = result["outputs"]
-    # images = []
-    # for node_id in outputs:
-    #     if "images" in outputs[node_id]:
-    #         for img in outputs[node_id]["images"]:
-    #             images.append(img["filename"])
-    #
-    # return images
-</code></pre>
-<p>:::</p>
-<h3>3. 更多接口调用</h3>
-<blockquote>
-<p><code>comfyui server.py</code> 提供了丰富的接口,如图<code>1.2</code> 展示了部分接口。</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202509/3426265-20250924160115802-1424074.png" alt="图 1.2 " /></p>
-<p><a href="https://opendeep.wiki/comfyanonymous/ComfyUI/rest-api">API 接口文档</a></p>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-09-20T00:00:00.000Z</published>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[AI-agents]]></title>
         <id>https://sanswl.github.io//posts/ai-agents-study/</id>
         <link href="https://sanswl.github.io//posts/ai-agents-study/"/>
@@ -1953,15 +2188,15 @@ select col1, col2, col3 from table_name where col2 = 'value2';
         <id>https://sanswl.github.io//posts/randomaccess-file-lock/</id>
         <link href="https://sanswl.github.io//posts/randomaccess-file-lock/"/>
         <updated>2025-08-11T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[锁是一种同步机制，用于解决并发情况下访问共享资源时的竞争问题。而解决并发问题需要满足以下条件：原子性，可见性，互斥性。<br> 原子性：一...]]></summary>
+        <summary type="html"><![CDATA[锁是一种同步机制，用于解决并发情况下访问共享资源时的竞争问题。而解决并发问题需要满足以下条件：原子性，可见性，有序性。<br> 原子性：一...]]></summary>
         <content type="html"><![CDATA[<h3>锁的介绍</h3>
 <blockquote>
-<p>锁是一种同步机制，用于解决并发情况下访问共享资源时的竞争问题。而解决并发问题需要满足以下条件：原子性，可见性，互斥性。&lt;br&gt;</p>
+<p>锁是一种同步机制，用于解决并发情况下访问共享资源时的竞争问题。而解决并发问题需要满足以下条件：原子性，可见性，有序性。&lt;br&gt;</p>
 </blockquote>
 <blockquote>
 <p>原子性：一个操作是不可分割的，要么全部完成，要么全部不完成。&lt;br&gt;
 可见性：一个线程对共享资源的修改，其他线程立即可以看到。&lt;br&gt;
-互斥性：同一时刻，只有一个线程可以访问共享资源。&lt;br&gt;</p>
+有序性： 线程操作指令需要按照已经排列的顺序执行。&lt;br&gt;</p>
 </blockquote>
 <h3>文件锁的作用</h3>
 <blockquote>
@@ -1985,9 +2220,10 @@ select col1, col2, col3 from table_name where col2 = 'value2';
 利用创建文件和获取文件的读写权限来满足互斥、原子和可见性，实现文件锁。</p>
 </blockquote>
 <pre><code>/**
- * 文件锁实现利用RandomAccessFile来实现,
+ * 文件锁实现利用RandomAccessFile获取文件的读写权限来实现,
  * 注意如果你希望的是分布式或可多次创建的锁，
  * 文件名需要保证唯一性，譬如分布式id处理文件名，UUID等。
+ * 可重入文件锁可以只拦截写权限，放开读，从而读取文件内部情况。
  */
     File shutdownServerFile = new File("./");
     rf = new RandomAccessFile(new File(shutdownServerFile.getCanonicalPath() + "/lock.txt"), "rws");
@@ -1995,7 +2231,7 @@ select col1, col2, col3 from table_name where col2 = 'value2';
 
 </code></pre>
 <pre><code>/**
- * 释放锁
+ * 释放锁，注册了服务关闭的钩子函数
  */
 public void release(){
                 Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; {
@@ -3145,82 +3381,6 @@ X&lt;sup&gt;n&lt;/sup&gt; + Y&lt;sup&gt;n&lt;/sup&gt; = Z&lt;sup&gt;n&lt;/sup&gt
         <published>2025-03-06T00:00:00.000Z</published>
     </entry>
     <entry>
-        <title type="html"><![CDATA[MQTT认证【一】]]></title>
-        <id>https://sanswl.github.io//posts/46918707-3b4d/</id>
-        <link href="https://sanswl.github.io//posts/46918707-3b4d/"/>
-        <updated>2025-03-06T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[1. 认证架构图 Auth & ACL 钩子作为验证功能的扩展 EMQX 认证器 按照认证方式和数据源来划分，EMQX 内置了以下 8 种认...]]></summary>
-        <content type="html"><![CDATA[<p><code>1. </code> 认证架构图
-<img src="https://docs.emqx.com/assets/emqx-authn-flow.nqM4_Tys.png" alt="" /></p>
-<blockquote>
-<p>Auth &amp; ACL 钩子作为验证功能的扩展
-EMQX 认证器
-按照认证方式和数据源来划分，EMQX 内置了以下 8 种认证器：</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>认证方式</th>
-<th>数据源</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>密码认证</td>
-<td>内置数据库</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mnesia.html">使用内置数据库（Mnesia）进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>MySQL</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mysql.html">使用 MySQL 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>PostgreSQL</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/postgresql.html">使用 PostgreSQL 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>MongoDB</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mongodb.html">使用 MongoDB 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>Redis</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/redis.html">使用 Redis 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>HTTP Server</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/http.html">使用 HTTP 服务进行密码认证</a></td>
-</tr>
-<tr>
-<td>JWT</td>
-<td>--</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/jwt.html">JWT 认证</a></td>
-</tr>
-<tr>
-<td>增强认证</td>
-<td>内置数据库</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/scram.html">MQTT 5.0 增强认证(SCRAM 认证)</a></td>
-</tr>
-</tbody>
-</table>
-<p><code>2. </code>认证接入</p>
-<blockquote>
-<p>官网提供DashBoard认证管理页，如果期望自定义Hook实现，需要使用插件扩展开发，以gRpc为例；
-<a href="https://github.com/emqx/emqx-extension-examples">官方给出的代码示例</a></p>
-</blockquote>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-06T00:00:00.000Z</published>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[Java SPI机制使用]]></title>
         <id>https://sanswl.github.io//posts/36930228-9c7f/</id>
         <link href="https://sanswl.github.io//posts/36930228-9c7f/"/>
@@ -3338,156 +3498,79 @@ public static void register() throws SQLException {
         <published>2025-03-06T00:00:00.000Z</published>
     </entry>
     <entry>
-        <title type="html"><![CDATA[布隆过滤器简述【Guava实现】]]></title>
-        <id>https://sanswl.github.io//posts/bc6a9c8c-fb95/</id>
-        <link href="https://sanswl.github.io//posts/bc6a9c8c-fb95/"/>
-        <updated>2025-03-05T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[简述：布隆过滤器是一种利用对象表示，通过插入自定义缓存判断对象是否存在、不存在的技术； 举例，已Guava工具包中的布隆为例 <depen...]]></summary>
-        <content type="html"><![CDATA[<ol>
-<li>简述：</li>
-</ol>
+        <title type="html"><![CDATA[MQTT认证【一】]]></title>
+        <id>https://sanswl.github.io//posts/46918707-3b4d/</id>
+        <link href="https://sanswl.github.io//posts/46918707-3b4d/"/>
+        <updated>2025-03-06T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[1. 认证架构图 Auth & ACL 钩子作为验证功能的扩展 EMQX 认证器 按照认证方式和数据源来划分，EMQX 内置了以下 8 种认...]]></summary>
+        <content type="html"><![CDATA[<p><code>1. </code> 认证架构图
+<img src="https://docs.emqx.com/assets/emqx-authn-flow.nqM4_Tys.png" alt="" /></p>
 <blockquote>
-<p>布隆过滤器是一种利用对象表示，通过插入自定义缓存判断对象是否存在、不存在的技术；</p>
+<p>Auth &amp; ACL 钩子作为验证功能的扩展
+EMQX 认证器
+按照认证方式和数据源来划分，EMQX 内置了以下 8 种认证器：</p>
 </blockquote>
-<ol>
-<li>举例，已Guava工具包中的布隆为例</li>
-</ol>
-<pre><code>       &lt;dependency&gt;
-            &lt;groupId&gt;com.google.guava&lt;/groupId&gt;
-            &lt;artifactId&gt;guava&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-</code></pre>
+<table>
+<thead>
+<tr>
+<th>认证方式</th>
+<th>数据源</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>密码认证</td>
+<td>内置数据库</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mnesia.html">使用内置数据库（Mnesia）进行密码认证</a></td>
+</tr>
+<tr>
+<td>密码认证</td>
+<td>MySQL</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mysql.html">使用 MySQL 进行密码认证</a></td>
+</tr>
+<tr>
+<td>密码认证</td>
+<td>PostgreSQL</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/postgresql.html">使用 PostgreSQL 进行密码认证</a></td>
+</tr>
+<tr>
+<td>密码认证</td>
+<td>MongoDB</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mongodb.html">使用 MongoDB 进行密码认证</a></td>
+</tr>
+<tr>
+<td>密码认证</td>
+<td>Redis</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/redis.html">使用 Redis 进行密码认证</a></td>
+</tr>
+<tr>
+<td>密码认证</td>
+<td>HTTP Server</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/http.html">使用 HTTP 服务进行密码认证</a></td>
+</tr>
+<tr>
+<td>JWT</td>
+<td>--</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/jwt.html">JWT 认证</a></td>
+</tr>
+<tr>
+<td>增强认证</td>
+<td>内置数据库</td>
+<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/scram.html">MQTT 5.0 增强认证(SCRAM 认证)</a></td>
+</tr>
+</tbody>
+</table>
+<p><code>2. </code>认证接入</p>
 <blockquote>
-<p>在Guava工具包中实现的布隆过滤器，利用<code>hash</code>处理对象得出对应的<code>hashcode</code>，将<code>hashcode</code>存入一个
-<code>long</code>当中；<code>Guava</code>工具包中的布隆过滤器没有扩容，推荐创建时选择大于当前对象集2倍以上容量；</p>
+<p>官网提供DashBoard认证管理页，如果期望自定义Hook实现，需要使用插件扩展开发，以gRpc为例；
+<a href="https://github.com/emqx/emqx-extension-examples">官方给出的代码示例</a></p>
 </blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250305163235202-1219754169.png" alt="" /></p>
-<blockquote>
-<p>当新对象通过<code>hash</code>算出新的值后，与当前的<code>Long</code>进行位与操作，如果位置已经是<code>1</code>经过与操作不变，<code>0</code>转变为<code>1</code>
-如果存在<code>0</code>转变为<code>1</code>，表明这个对象是一个新的对象，没有被缓存过（即之前不存在的对象）</p>
-</blockquote>
-<ol>
-<li>缺点</li>
-</ol>
-<blockquote>
-<ol>
-<li>经过上述简介，我们知道<code>guava</code>实现的布隆过滤器存放在一个<code>long</code>下，现在假使这个缓存不会扩容的情况下，当存入的对象越来越多后，<code>long</code>的所有位都会变为<code>1</code>,此时过滤器完全失去作用，会判断所有对象存在;</li>
-<li>假使两个对象存入<code>long</code>后刚好占据后4位，将后4位转变为<code>1</code>，这时一个新对象经过<code>hash</code>后需要转变<code>long</code>的后4位为<code>1</code>，这时同样会判为已存在，即 <code>1+3 = 4</code>，所以布隆过滤器判断已存在的对象不可信,即<code>不存在的一定不存在，存在的不一定存在</code>；</li>
-<li>扩容问题，当过滤器中位为<code>1</code>的位越来越多后，布隆过滤器得出的结果就越会失真，使用扩容增加<code>0</code>位可以提高准确率，但是使用扩容方案，扩容前的对象由于存在多个对象混合插入的情况（即同一个<code>1</code> 会代表多个对象），扩容后的缓存如何恢复扩容前缓存的记录。可以采取废弃旧布隆直接创建新布隆处理（需要缓存的对象是被持久化的），提高可用性的话可以考虑多个过滤器混合构成，当前一个不够用直接创建一个新的，拿前一个+后一个得出的结果作为最终结果</li>
-<li>删除问题，类似扩容即同一个<code>1</code>会代表多个对象,经过<code>hash</code>后无法准确的只删除当前对象的<code>1</code>，可以使<code>1</code>增加计数器处理，当删除操作发生时，如果计数器存在值，优先减去计数器的值；</li>
-</ol>
-</blockquote>
-<ol>
-<li>源码阅读</li>
-</ol>
-<pre><code>    MURMUR128_MITZ_32 {
-      //将对象放入容器
-        public &lt;T&gt; boolean put(T object, Funnel&lt;? super T&gt; funnel, int numHashFunctions, LockFreeBitArray bits) {
-            //过滤器相应的容器缓存
-            long bitSize = bits.bitSize();
-            //取对象相应的hash值
-            long hash64 = Hashing.murmur3_128().hashObject(object, funnel).asLong();
-            int hash1 = (int)hash64;
-            int hash2 = (int)(hash64 &gt;&gt;&gt; 32);
-            boolean bitsChanged = false;
-          // numHashFunctions 目的是为了减少hash冲突
-            for(int i = 1; i &lt;= numHashFunctions; ++i) {
-                int combinedHash = hash1 + i * hash2;
-                if (combinedHash &lt; 0) {
-                    combinedHash = ~combinedHash;
-                }
-              //判断是否有位变化，取余操作是为了避免越界
-                bitsChanged |= bits.set((long)combinedHash % bitSize);
-            }
-
-            return bitsChanged;
-        }
-
-        public &lt;T&gt; boolean mightContain(T object, Funnel&lt;? super T&gt; funnel, int numHashFunctions, LockFreeBitArray bits) {
-            long bitSize = bits.bitSize();
-            long hash64 = Hashing.murmur3_128().hashObject(object, funnel).asLong();
-            int hash1 = (int)hash64;
-            int hash2 = (int)(hash64 &gt;&gt;&gt; 32);
-
-            for(int i = 1; i &lt;= numHashFunctions; ++i) {
-                int combinedHash = hash1 + i * hash2;
-                if (combinedHash &lt; 0) {
-                    combinedHash = ~combinedHash;
-                }
-
-                if (!bits.get((long)combinedHash % bitSize)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
-static final class LockFreeBitArray {
-        private static final int LONG_ADDRESSABLE_BITS = 6;
-        final AtomicLongArray data;
-        private final LongAddable bitCount;
-
-        LockFreeBitArray(long bits) {
-          // 确保类型转换安全，保证初始化的容器位全为初始值，避免精度丢失导致创建的容器存在值
-          /**
-              public static int checkedCast(long value) {
-                    int result = (int)value;
-                    Preconditions.checkArgument((long)result == value, "Out of range: %s", value);
-                    return result;
-              }
-          */
-            this(new long[Ints.checkedCast(LongMath.divide(bits, 64L, RoundingMode.CEILING))]);
-        }
-
-       boolean set(long bitIndex) {
-            if (this.get(bitIndex)) {
-                return false;
-            } else {
-              // &gt;&gt;&gt; 无符号移位操作，保证结果为正数 
-              /**
-                const a = 5; //  00000000000000000000000000000101
-                const b = 2; //  00000000000000000000000000000010
-                const c = -5; //  11111111111111111111111111111011
-
-                console.log(a &gt;&gt;&gt; b); //  00000000000000000000000000000001
-                // Expected output: 1
-
-                console.log(c &gt;&gt;&gt; b); //  00111111111111111111111111111110
-                // Expected output: 1073741822
-              */
-              // LONG_ADDRESSABLE_BITS = 6
-                int longIndex = (int)(bitIndex &gt;&gt;&gt; LONG_ADDRESSABLE_BITS );
-              //顶掉了符号位，和 &gt;&gt;&gt; 无符号操作保持一致
-                long mask = 1L &lt;&lt; (int)bitIndex;  // only cares about low 6 bits of bitIndex
-
-                long oldValue;
-                long newValue;
-                do {
-                    oldValue = this.data.get(longIndex);
-                    newValue = oldValue | mask;
-                    if (oldValue == newValue) {
-                        return false;
-                    }
-                } while(!this.data.compareAndSet(longIndex, oldValue, newValue));
-
-                this.bitCount.increment();
-                return true;
-            }
-        }
-    
-     boolean get(long bitIndex) {
-            return (this.data.get((int)(bitIndex &gt;&gt;&gt; 6)) &amp; 1L &lt;&lt; (int)bitIndex) != 0L;
-     }
-
-}
-</code></pre>
 ]]></content>
         <author>
             <name>SANSWL</name>
             <uri>https://sanswl.github.io//</uri>
         </author>
-        <published>2025-03-05T00:00:00.000Z</published>
+        <published>2025-03-06T00:00:00.000Z</published>
     </entry>
 </feed>
