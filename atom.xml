@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//</id>
     <title>SANSWL's BLOG</title>
-    <updated>2025-09-25T20:29:39.014Z</updated>
+    <updated>2025-10-09T18:36:31.850Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -13,6 +13,234 @@
     <link rel="self" href="https://sanswl.github.io/atom.xml"/>
     <subtitle>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</subtitle>
     <rights>Copyright © 2025 SANSWL</rights>
+    <entry>
+        <title type="html"><![CDATA[高级语言的实现原理]]></title>
+        <id>https://sanswl.github.io//posts/programming-language-make/</id>
+        <link href="https://sanswl.github.io//posts/programming-language-make/"/>
+        <updated>2025-10-08T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[我希望了解编程语言的真正执行过程，最好的办法就是自己写一种语言，但是不需要关注太多功能内容，只实现简单的脚本语言，甚至不完全实现加减乘除的...]]></summary>
+        <content type="html"><![CDATA[<h3>0. 介绍</h3>
+<blockquote>
+<p>我希望了解编程语言的真正执行过程，最好的办法就是自己写一种语言，但是不需要关注太多功能内容，只实现简单的脚本语言，甚至不完全实现加减乘除的功能。不仅仅是面向对象的语言，SQL和Shell此类脚本语言同样适用。</p>
+</blockquote>
+<p>参考链接：</p>
+<ul>
+<li><a href="https://hackernoon.com/building-your-own-programming-language-from-scratch#aboutCard">Java 实现</a>👍使用Java语言实现自己的编程语言，Github仓库内容更加完备，有着额外相关的包管理和堆栈上下文操作实现</li>
+<li><a href="https://medium.com/@abiliu018/how-i-created-my-own-programming-language-from-scratch-9b99fa0a802b">JavaScript 实现</a>👍使用JS实现，可以和Java的对照理解，加深对各组件实现的理解。</li>
+<li><a href="https://astexplorer.net/">AST</a>👍 可以直观看到每种语言的源码会被解析成什么样的结果，建议了解，比较直观的AST结构</li>
+</ul>
+<p><img src="https://sanswl.github.io/_astro/AST.BMP6Hsjp_Z1ayyv0.webp" alt="AST 结构" /></p>
+<h3>1. 高级语言的解析</h3>
+<ol>
+<li><strong>Lexical analysis</strong>(词法分析)：用于将源码内容进行标记，例如以Java和JS为例，<code>new</code> 、<code>let</code> 作为关键字（KeyWord），空格换行（<code>\t \n</code>）作为空字符，操作符（<code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>!</code>）等。。。</li>
+<li><strong>Syntax analysis or parser</strong>（语法分析器）：用于将词法分析后的标记解析生成AST（抽象语法树）；</li>
+<li>Evaluator：负责解析和执行你的源代码，通过遍历分析器生成的AST实现。</li>
+</ol>
+<h3>2. 最终成果</h3>
+<blockquote>
+<p>下面会给出关键代码（非具体），完成的过于简单，仅供参考。</p>
+</blockquote>
+<pre><code> @SneakyThrows
+    public void execute(Path path) {
+        String source = Files.readString(path); //读取源码文件
+        LanguageParser lexicalParser = new LanguageParser&lt;&gt;(new ArrayList&lt;&gt;(),source);//解析源码
+        List&lt;Token&gt; tokens = lexicalParser.parse();
+        StatementParser statementParser = new StatementParser(tokens); //词性分析
+        Statement statement = statementParser.parse();
+        statement.execute(); //执行
+    }
+</code></pre>
+<pre><code>struct Person
+    arg name
+    arg experience
+    arg developer
+end
+
+input your_name
+input your_experience_in_years
+input is_developer
+
+person = new Person [your_name your_experience_in_years is_developer]
+print person :: name
+
+if person :: developer then
+
+    person_name = person :: name
+    print "hey " + person_name + "!"
+
+    experience = person :: experience
+
+    if experience &gt; 0 then
+        started_in = 2022 + experience
+        print "you had started your career in " + started_in
+    end
+
+end
+</code></pre>
+<h4>2.1 Token</h4>
+<blockquote>
+<p>词元标记，直白说就是对每个字符进行分类存储，比如说 { a,b,v,c,d,e... }这些可以标记为英文字符,{我，你，她......}标记为中文字符，而当我们学习高级语言或其他编程语言时，我们总会先学习例如关键字（<code>new</code>、<code>if</code> 、<code>while</code>.....）这些就可以标记为关键字，同理（<code>&gt;</code> 、<code>&lt;</code>、<code>*</code> 、<code>/</code>、<code>=</code> ....）可以标记为操作符,完成赋值、运算等功能。</p>
+</blockquote>
+<pre><code>/**
+以下标记分类作为参考，可在上述链接的github找到更加全面的分类
+*/
+public enum TokenType {
+            Whitespace("[\\s\\t\\n\\r]"),
+            Keyword("(if|then|end|print|input|struct|arg|new)"),
+            LogicalOperator("true|false"),
+            Numeric("[0-9]+"),
+            GroupDivider("(\\[|\\])"),
+            Text("\"([^\"]*)\""),//双引号包裹的标记字符串
+            Variable("[a-zA-Z_]+[a-zA-Z0-9_]*"), //标记为变量
+            Operator("(\\+|\\-|\\&gt;|\\&lt;|\\={1,2}|\\!|\\:{2})"),//标记为操作符
+            Comment(""),
+            EndOfFile("");
+}
+/**
+存储解析的词元性质，record 是JDK14+ 特性
+*/
+public record Token(TokenType nameType, String value) {}
+
+</code></pre>
+<h4>2.2 lexicalParser</h4>
+<blockquote>
+<p>简单来说，就是将你设定的源码文件内容字符读取进行标记分类好并存储起来，比如person <strong>=</strong> <strong>new</strong> Person [ arg1 arg2 ]  一行中<code>person</code>标记为变量，<code>=</code>标记为操作符，<code> new</code>标记为关键字等等，标记的具体含义是自定义的。</p>
+</blockquote>
+<pre><code>  public int nextToken(int position) {
+        String nextToken = source.substring(position);
+        /*对源文件的词元进行分类存储到 this.tokens集合中，
+        集合推荐使用LinkedList一类的，保证词元解析顺序，
+        尤其是结构体这块需要注意，变量和对象参数的对应顺序问题 */
+        return TokensReslove.resolve(nextToken, (List&lt;Token&gt;) this.tokens);
+    }
+
+// 解析分类Token
+    public List&lt;Token&gt; parse() {
+        int position = 0;
+        while (position &lt; source.length()){
+            position+=nextToken(position);
+        }
+        return (List&lt;Token&gt;) tokens;
+    }
+</code></pre>
+<h4>2.3 statementParser</h4>
+<blockquote>
+<p>利用解析获得Token（即分类好的单词【空格、person、= 、+、。。。。】）组成AST，最后遍历执行</p>
+</blockquote>
+<pre><code>// 构建AST和执行语句 
+public Statement parseExpression() {
+         Token token = nextToken(TokenType.Keyword,TokenType.Variable);
+         switch (token.nameType()){
+             case Keyword:
+                 switch (token.value()){
+                     case "if":
+                         Expression condition = readExpression();
+                         nextToken(TokenType.Keyword, "then"); //skip then
+
+                         ConditionStatement conditionStatement = new ConditionStatement(condition);
+                         while (!peek(TokenType.Keyword, "end")) {
+                             Statement statement = parseExpression();
+                             conditionStatement.add(statement);
+                         }
+                         nextToken(TokenType.Keyword, "end"); //skip end
+
+                         return conditionStatement;
+                     case "print":
+                         Expression expression = readExpression();
+                         return new PrintStatement(expression);
+                     case "input":
+                         Token var = nextToken(new TokenType[]{TokenType.Variable});
+                         return new InputStatement(var.value(), scanner::nextLine,variables::put);
+                     case "struct":
+                         Token type = nextToken(new TokenType[]{TokenType.Variable});
+
+                         Set&lt;String&gt; args = new LinkedHashSet&lt;&gt;();
+                         while (!peek(TokenType.Keyword, "end")) {
+                             nextToken(TokenType.Keyword, "arg");
+
+                             Token arg = nextToken(new TokenType[]{TokenType.Variable});
+                             args.add(arg.value());
+                         }
+                         nextToken(TokenType.Keyword, "end"); //skip end
+
+                         structures.put(type.value(), new StructureDefinition(type.value(), new LinkedList&lt;&gt;(args)));
+
+                         return null;
+                 }
+             case Variable:
+                 nextToken(TokenType.Operator, "=");
+                 Expression expression;
+                 if (peek(TokenType.Keyword, "new")) {
+                     expression = readInstance();
+//                     expression = null;
+                 } else {
+                     expression = readExpression();
+                 }
+                 return new AssignStatement(token.value(), expression, variables::put);
+             case Text:
+             default:
+                 throw new IllegalArgumentException("Expected keyword or variable but found " + token.nameType() + " " + token.value());
+         }
+
+    }
+
+  //解析token组成AST
+    public Statement parse() {
+        CompositeStatement root = new CompositeStatement();
+        while (position &lt; tokens.size()) {
+            Statement statement = parseExpression();
+            root.add(statement);
+        }
+    // root下包含着需要执行的操作语句，比如构建对象，if判断，输入，输出等语句
+        return root;
+    }
+
+
+    @Override
+    public void execute() {
+       // root  执行语句
+        for (Statement statement : statements) {
+            statement.execute();
+        }
+    }
+
+</code></pre>
+<h4>2.4 问题</h4>
+<ul>
+<li>变量和对象参数顺序问题：</li>
+</ul>
+<pre><code>  struct Person
+      arg name
+      arg experience
+      arg developer
+  end
+  input your_name
+  input your_experience_in_years
+  input is_developer
+  //name、experience、developer被赋值需要和变量顺序一致，但是如果你使用hashmap存储参数会导致顺序为name、developer、experience
+  person = new Person [your_name your_experience_in_years is_developer]
+</code></pre>
+<ul>
+<li>如何打包成可执行文件？要求 JDK 14 +
+<a href="https://docs.oracle.com/en/java/javase/21/jpackage/preface.html#GUID-C8F52DC6-0750-497D-9DAB-2F88E10787BE">Java打包工具jpackage - 官方文档</a>
+<a href="https://segmentfault.com/a/1190000044693072">Jpackage-制作无需预装Java环境的Jar可执行程序</a></li>
+</ul>
+<h3>3. 扩展（可增强学习点）</h3>
+<ul>
+<li>内存上下文：栈、堆、静态变量、常量池、方法区等</li>
+<li>包管理：类似Java的包管理机制，包括包的导入、导包、类的加载、类的冲突解决等。</li>
+<li>异常处理：try-catch-finally</li>
+<li>多线程：线程创建、同步、锁、死锁、线程池（线程的本质就是创造一个关于操作符的堆栈）</li>
+<li>GC：垃圾回收算法、垃圾回收器、内存分配策略、内存碎片、内存泄漏</li>
+<li>语法糖：语法糖是指一些语法的扩展，比如Java中的Stream API、Lambdas表达式、Optional类等。</li>
+</ul>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-10-08T00:00:00.000Z</published>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Elasticsearch 使用知识汇总]]></title>
         <id>https://sanswl.github.io//posts/elasticsearch-usage-read/</id>
@@ -3490,82 +3718,6 @@ public static void register() throws SQLException {
         }
     }
 </code></pre>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-06T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[MQTT认证【一】]]></title>
-        <id>https://sanswl.github.io//posts/46918707-3b4d/</id>
-        <link href="https://sanswl.github.io//posts/46918707-3b4d/"/>
-        <updated>2025-03-06T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[1. 认证架构图 Auth & ACL 钩子作为验证功能的扩展 EMQX 认证器 按照认证方式和数据源来划分，EMQX 内置了以下 8 种认...]]></summary>
-        <content type="html"><![CDATA[<p><code>1. </code> 认证架构图
-<img src="https://docs.emqx.com/assets/emqx-authn-flow.nqM4_Tys.png" alt="" /></p>
-<blockquote>
-<p>Auth &amp; ACL 钩子作为验证功能的扩展
-EMQX 认证器
-按照认证方式和数据源来划分，EMQX 内置了以下 8 种认证器：</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>认证方式</th>
-<th>数据源</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>密码认证</td>
-<td>内置数据库</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mnesia.html">使用内置数据库（Mnesia）进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>MySQL</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mysql.html">使用 MySQL 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>PostgreSQL</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/postgresql.html">使用 PostgreSQL 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>MongoDB</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/mongodb.html">使用 MongoDB 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>Redis</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/redis.html">使用 Redis 进行密码认证</a></td>
-</tr>
-<tr>
-<td>密码认证</td>
-<td>HTTP Server</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/http.html">使用 HTTP 服务进行密码认证</a></td>
-</tr>
-<tr>
-<td>JWT</td>
-<td>--</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/jwt.html">JWT 认证</a></td>
-</tr>
-<tr>
-<td>增强认证</td>
-<td>内置数据库</td>
-<td><a href="https://docs.emqx.com/zh/emqx/v5.0/access-control/authn/scram.html">MQTT 5.0 增强认证(SCRAM 认证)</a></td>
-</tr>
-</tbody>
-</table>
-<p><code>2. </code>认证接入</p>
-<blockquote>
-<p>官网提供DashBoard认证管理页，如果期望自定义Hook实现，需要使用插件扩展开发，以gRpc为例；
-<a href="https://github.com/emqx/emqx-extension-examples">官方给出的代码示例</a></p>
-</blockquote>
 ]]></content>
         <author>
             <name>SANSWL</name>
