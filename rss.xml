@@ -5,7 +5,7 @@
         <title>SANSWL's BLOG</title>
         <link>https://sanswl.github.io//</link>
         <description>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</description>
-        <lastBuildDate>Thu, 09 Oct 2025 18:36:35 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 10 Oct 2025 15:54:47 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
         <language>zh</language>
@@ -37,6 +37,7 @@
 <h3>2. 最终成果</h3>
 <blockquote>
 <p>下面会给出关键代码（非具体），完成的过于简单，仅供参考。</p>
+<p>也可参考Mybatis的org.apache.ibatis.ognl下AST操作</p>
 </blockquote>
 <pre><code> @SneakyThrows
     public void execute(Path path) {
@@ -1890,6 +1891,165 @@ public class WetherMcpServer {
 ]]></content:encoded>
         </item>
         <item>
+            <title><![CDATA[Mybatis in springboot]]></title>
+            <link>https://sanswl.github.io//posts/orm-mybatis-study/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/orm-mybatis-study/</guid>
+            <pubDate>Thu, 18 Sep 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[Mybatis是Java 的一种常用的ORM框架，允许用户可以通过代码的对象和数据库进行映射。Mybatis-Plus(以下简称MP)，是...]]></description>
+            <content:encoded><![CDATA[<h3>1. 了解Mybatis</h3>
+<blockquote>
+<p>Mybatis是Java 的一种常用的ORM框架，允许用户可以通过代码的对象和数据库进行映射。</p>
+<p>Mybatis-Plus(以下简称MP)，是对Mybatis的增强包，可以与Mybatis不冲突的使用，学习成本较低（1h左右基本掌握使用）；</p>
+</blockquote>
+<p>以下均为ORM框架，且部分允许Java/kotlin进行混用编写。你可以进入官网查看各自框架的性能和了解他们各自的学习成本。</p>
+<ul>
+<li><a href="https://github.com/babyfish-ct/jimmer">Jimmer</a></li>
+<li><a href="https://spring.io/projects/spring-data-jdbc">spring-data-jdbc</a></li>
+<li><a href="https://spring.io/projects/spring-data-jpa">spring-data-jpa</a></li>
+<li><a href="https://github.com/dromara/easy-query">easy-query</a></li>
+<li><a href="https://mybatis.org/mybatis-3/">mybatis</a></li>
+<li>......</li>
+</ul>
+<h3>2. 走近源码</h3>
+<p><img src="https://sanswl.github.io/_astro/mybatis.ByS14HG3_1ksrjx.webp" alt="mybatis 、mybatis-spring" /></p>
+<ol>
+<li>生命周期</li>
+</ol>
+<blockquote>
+<p>无论什么框架或者应用，照着他的生命周期看下去，基本上可以弄懂个7788了。</p>
+</blockquote>
+<pre><code>flowchart TD
+    A[SqlSessionFactoryBuilder] --&gt;|build| B(SqlSessionFactory)
+    B --&gt;|open| C(SqlSession)--&gt;|getMapper|D(Mapper Instances)
+</code></pre>
+<ol>
+<li>关键函数/类</li>
+</ol>
+<ul>
+<li><code>DataSource</code> : 用于创建连接信息</li>
+<li><code>SqlSessionFactory</code> ： 连接工厂，即JDBC，需要指定数据源和Mapper映射文件</li>
+<li><code>SqlSessionTemplate</code> ： sql的会话模板，是线程安全的，可由多个DAO共享</li>
+<li><code>DataSourceTransactionManager</code>：事务管理器，spring容器@Transactional注解的底层实现，例如Neo4jTransactionManager only supports 'required' or 'requires new' propagation，neo4j传播机制只支持required或requires new，当你使用多数据库比如PGSQL、Neo4j时，需要注意管理事务管理器。</li>
+<li><code>MapperScan</code> ： 映射器扫描、注册，扫描指定包下的所有Mapper接口，并注册到spring容器中</li>
+</ul>
+<h3>3. 一步一步的debug</h3>
+<ul>
+<li>springboot中Mybatis的 sql 执行流程</li>
+</ul>
+<blockquote>
+<p>调用Mapper层，执行sql语句，Mapper层调用sqlsession执行注解书写的SQL语句或xml指定的SQL语句</p>
+</blockquote>
+<ul>
+<li>从下图可以看到，mybatis SQL语句执行的对象是代理对象，有着缓存和sqlsession（执行SQL）属性</li>
+</ul>
+<p><img src="https://sanswl.github.io/_astro/mybatis-proxy.COQxUS6Y_119fwu.webp" alt="代理对象" /></p>
+<ul>
+<li>代理对象的获取，很显然mybatis执行sql使用的是代理对象，从<code>@MapperScan</code>注解断点容易找到以下信息：</li>
+</ul>
+<pre><code>//相关扫描类
+public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {}
+
+@Override
+  public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+    if (this.processPropertyPlaceHolders) {
+      processPropertyPlaceHolders();
+    }
+    //扫描mapper接口，根据mapperscan的basepackage，扫描指定包下的所有Mapper接口，并注册到spring容器中
+    ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
+    scanner.setAddToConfig(this.addToConfig);
+    scanner.setAnnotationClass(this.annotationClass);
+    scanner.setMarkerInterface(this.markerInterface);
+    scanner.setSqlSessionFactory(this.sqlSessionFactory);
+    scanner.setSqlSessionTemplate(this.sqlSessionTemplate);
+    scanner.setSqlSessionFactoryBeanName(this.sqlSessionFactoryBeanName);
+    scanner.setSqlSessionTemplateBeanName(this.sqlSessionTemplateBeanName);
+    scanner.setResourceLoader(this.applicationContext);
+    scanner.setBeanNameGenerator(this.nameGenerator);
+    scanner.setMapperFactoryBeanClass(this.mapperFactoryBeanClass);
+    if (StringUtils.hasText(lazyInitialization)) {
+      scanner.setLazyInitialization(Boolean.valueOf(lazyInitialization));
+    }
+    if (StringUtils.hasText(defaultScope)) {
+      scanner.setDefaultScope(defaultScope);
+    }
+    scanner.registerFilters();
+    scanner.scan(
+        StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
+  }
+
+public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
+    doscan(); //扫描到对应的包下的Mapper，并注册到Spring容器中
+}
+    //内容太长，只截取了入口函数作为记录
+  private void processBeanDefinitions(Set&lt;BeanDefinitionHolder&gt; beanDefinitions) {
+        BeanDefinitionRegistry registry = this.getRegistry();
+        Iterator var4 = beanDefinitions.iterator();
+
+        while(var4.hasNext()) {
+            BeanDefinitionHolder holder = (BeanDefinitionHolder)var4.next();
+            AbstractBeanDefinition definition = (AbstractBeanDefinition)holder.getBeanDefinition();
+            boolean scopedProxy = false;
+            if (ScopedProxyFactoryBean.class.getName().equals(definition.getBeanClassName())) {
+                definition = (AbstractBeanDefinition)Optional.ofNullable(((RootBeanDefinition)definition).getDecoratedDefinition()).map(BeanDefinitionHolder::getBeanDefinition).orElseThrow(() -&gt; {
+                    return new IllegalStateException("The target bean definition of scoped proxy bean not found. Root bean definition[" + holder + "]");
+                });
+                scopedProxy = true;
+            }
+            definition.setBeanClass(this.mapperFactoryBeanClass); //询问AI可以了解到这是完成代理关键步骤，允许Spring后续使用工厂实现代理
+            definition.getPropertyValues().add("addToConfig", this.addToConfig);
+    }
+    }
+
+     // Mapper代理获取
+     public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
+        MapperProxyFactory&lt;T&gt; mapperProxyFactory = (MapperProxyFactory)this.knownMappers.get(type);
+        if (mapperProxyFactory == null) {
+            throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
+        } else {
+            try {
+                return mapperProxyFactory.newInstance(sqlSession);
+            } catch (Exception var5) {
+                Exception e = var5;
+                throw new BindingException("Error getting mapper instance. Cause: " + e, e);
+            }
+        }
+    }
+</code></pre>
+<p><img src="https://sanswl.github.io/_astro/mybatis-proxy-bean.DvI_PYGh_Z22HJ10.webp" alt="Mapper 注册到IOC容器" /></p>
+<ul>
+<li>调用Mapper层，执行sql语句</li>
+</ul>
+<pre><code>//org.apache.ibatis.binding.MapperProxy
+ public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        try {
+            return Object.class.equals(method.getDeclaringClass()) ? method.invoke(this, args) : this.cachedInvoker(method).invoke(proxy, method, args, this.sqlSession);
+        } catch (Throwable var5) {
+            Throwable t = var5;
+            throw ExceptionUtil.unwrapThrowable(t);
+        }
+    }
+
+ private static class PlainMethodInvoker implements MapperMethodInvoker {
+        private final MapperMethod mapperMethod;
+
+        public PlainMethodInvoker(MapperMethod mapperMethod) {
+            this.mapperMethod = mapperMethod;
+        }
+
+        public Object invoke(Object proxy, Method method, Object[] args, SqlSession sqlSession) throws Throwable {
+            return this.mapperMethod.execute(sqlSession, args);
+        }
+    }
+</code></pre>
+<h3>4. 流程总结</h3>
+<ol>
+<li>注册配置文件，datasource，TransactionManager等信息</li>
+<li>扫描指定的basePackages下的所有Mapper 实例，并注册代理到spring容器中</li>
+<li>调用代理的MapperProxy对象， invoke 执行调用</li>
+</ol>
+]]></content:encoded>
+        </item>
+        <item>
             <title><![CDATA[comfyUi学习游玩]]></title>
             <link>https://sanswl.github.io//posts/comfyui-studypreview/</link>
             <guid isPermaLink="false">https://sanswl.github.io//posts/comfyui-studypreview/</guid>
@@ -3484,118 +3644,6 @@ X&lt;sup&gt;n&lt;/sup&gt; + Y&lt;sup&gt;n&lt;/sup&gt; = Z&lt;sup&gt;n&lt;/sup&gt
             <pubDate>Thu, 06 Mar 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[pass]]></description>
             <content:encoded><![CDATA[<p>pass</p>
-]]></content:encoded>
-        </item>
-        <item>
-            <title><![CDATA[Java SPI机制使用]]></title>
-            <link>https://sanswl.github.io//posts/36930228-9c7f/</link>
-            <guid isPermaLink="false">https://sanswl.github.io//posts/36930228-9c7f/</guid>
-            <pubDate>Thu, 06 Mar 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[1. Service Provider Interface SPI描述 接口提供者优先规定接口要求，然后交由具体的实现者对接口进行内容的实现...]]></description>
-            <content:encoded><![CDATA[<p><code>1.</code> <code>Service Provider Interface</code> <strong>SPI描述</strong></p>
-<blockquote>
-<p>接口提供者优先规定接口要求，然后交由具体的实现者对接口进行内容的实现；</p>
-</blockquote>
-<p><code>2.</code> 实现</p>
-<pre><code>//1. 定义接口
-public Interface Demo_interface{
-    //具体实现者必须要实现的内容
-    void doexcute();
-}
-//2.实现接口
-public class Demo_Impl implements Demo_interface{
-  void doexcute(){
-      //pass  
-  }
-}
-//3. 使用ServiceLoader读取文件加载对象（ServiceLoader是主进程模块调用的）
-ServiceLoader&lt;Demo_interface&gt; demoServiceLoader = ServiceLoader.load(Demo_interface.class);
-
-</code></pre>
-<p><code>3</code> 举例说明</p>
-<blockquote>
-<p>以 JDBC 的 PostgreSQL 实现为例(Mysql同理)</p>
-</blockquote>
-<ul>
-<li>一 ： 实现类模块文件结构需要保持下图所示，其中文件名称<code>java.sql.Drive</code>就是JDBC定义需要被实现的接口，内容<code>org.postgresql.Driver</code>表明的是实现类的路径
-<img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250306164732074-568127332.png" alt="" /></li>
-<li>二 ：JDBC步骤说明；注册驱动 ==&gt; 创建连接 ==&gt; 构建执行器 ==&gt; 获取结果集 ==&gt; 关闭连接</li>
-</ul>
-<pre><code>//注册驱动，这里的DriverManager将会调用ServiceLoader将实现类注入
-public static void register() throws SQLException {
-        if (isRegistered()) {
-            throw new IllegalStateException("Driver is already registered. It can only be registered once.");
-        } else {
-            Driver registeredDriver = new Driver();
-            DriverManager.registerDriver(registeredDriver);
-            Driver.registeredDriver = registeredDriver;
-        }
-    }
-// 驱动初始化，DriverManager调用ServiceLoader（DriverManager属于java.sql包下）
-//调取时机，此方法是写在static块中，所以和class一起，故class.forName("")即可注册驱动
- private static void loadInitialDrivers() {
-        String drivers;
-        try {
-            drivers = AccessController.doPrivileged(new PrivilegedAction&lt;String&gt;() {
-                public String run() {
-                    return System.getProperty("jdbc.drivers");
-                }
-            });
-        } catch (Exception ex) {
-            drivers = null;
-        }
-        // If the driver is packaged as a Service Provider, load it.
-        // Get all the drivers through the classloader
-        // exposed as a java.sql.Driver.class service.
-        // ServiceLoader.load() replaces the sun.misc.Providers()
-
-        AccessController.doPrivileged(new PrivilegedAction&lt;Void&gt;() {
-            public Void run() {
-
-                ServiceLoader&lt;Driver&gt; loadedDrivers = ServiceLoader.load(Driver.class);
-                Iterator&lt;Driver&gt; driversIterator = loadedDrivers.iterator();
-
-                /* Load these drivers, so that they can be instantiated.
-                 * It may be the case that the driver class may not be there
-                 * i.e. there may be a packaged driver with the service class
-                 * as implementation of java.sql.Driver but the actual class
-                 * may be missing. In that case a java.util.ServiceConfigurationError
-                 * will be thrown at runtime by the VM trying to locate
-                 * and load the service.
-                 *
-                 * Adding a try catch block to catch those runtime errors
-                 * if driver not available in classpath but it's
-                 * packaged as service and that service is there in classpath.
-                 */
-                try{
-                    while(driversIterator.hasNext()) {
-                        driversIterator.next();
-                    }
-                } catch(Throwable t) {
-                // Do nothing
-                }
-                return null;
-            }
-        });
-
-        println("DriverManager.initialize: jdbc.drivers = " + drivers);
-
-        if (drivers == null || drivers.equals("")) {
-            return;
-        }
-        String[] driversList = drivers.split(":");
-        println("number of Drivers:" + driversList.length);
-        for (String aDriver : driversList) {
-            try {
-                println("DriverManager.Initialize: loading " + aDriver);
-                Class.forName(aDriver, true,
-                        ClassLoader.getSystemClassLoader());
-            } catch (Exception ex) {
-                println("DriverManager.Initialize: load failed: " + ex);
-            }
-        }
-    }
-</code></pre>
 ]]></content:encoded>
         </item>
     </channel>
