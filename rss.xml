@@ -5,7 +5,7 @@
         <title>SANSWL's BLOG</title>
         <link>https://sanswl.github.io//</link>
         <description>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</description>
-        <lastBuildDate>Fri, 10 Oct 2025 15:54:47 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 14 Oct 2025 09:48:28 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
         <language>zh</language>
@@ -126,7 +126,7 @@ public record Token(TokenType nameType, String value) {}
 <blockquote>
 <p>利用解析获得Token（即分类好的单词【空格、person、= 、+、。。。。】）组成AST，最后遍历执行</p>
 </blockquote>
-<pre><code>// 构建AST和执行语句 
+<pre><code>// 构建AST和执行语句
 public Statement parseExpression() {
          Token token = nextToken(TokenType.Keyword,TokenType.Variable);
          switch (token.nameType()){
@@ -193,7 +193,6 @@ public Statement parseExpression() {
     // root下包含着需要执行的操作语句，比如构建对象，if判断，输入，输出等语句
         return root;
     }
-
 
     @Override
     public void execute() {
