@@ -5,12 +5,309 @@
         <title>SANSWL's BLOG</title>
         <link>https://sanswl.github.io//</link>
         <description>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</description>
-        <lastBuildDate>Sun, 19 Oct 2025 15:49:02 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 30 Oct 2025 13:34:48 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
         <language>zh</language>
         <copyright>Copyright © 2025 SANSWL</copyright>
         <atom:link href="https://sanswl.github.io/rss.xml" rel="self" type="application/rss+xml"/>
+        <item>
+            <title><![CDATA[LLMs-应用1-聊天机器人]]></title>
+            <link>https://sanswl.github.io//posts/llms-usage-chatbot/</link>
+            <guid isPermaLink="false">https://sanswl.github.io//posts/llms-usage-chatbot/</guid>
+            <pubDate>Tue, 28 Oct 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[大模型实现聊天机器人。Python 实现聊天机器人 <iframe src="https://excalidraw.com/#json=P...]]></description>
+            <content:encoded><![CDATA[<h3>1. LLMs 实际运用案例</h3>
+<blockquote>
+<p>大模型实现聊天机器人。</p>
+</blockquote>
+<p><a href="https://graphacademy.neo4j.com/courses/llm-chatbot-python/3-tools/1-vector-tool/">Python 实现聊天机器人</a></p>
+<p>&lt;iframe src="https://excalidraw.com/#json=POKGHBJTn95znC4HEGZWV,2_zeJoJB17oF-yNMW_8OWw" width="100%" height="600px" frameborder="0" &gt;&lt;/iframe</p>
+<h3>2. LLMs 选择</h3>
+<p>模型分类：</p>
+<pre><code>from langchain_ollama import OllamaLLM
+from langchain_ollama import OllamaEmbeddings
+
+# Create the LLM
+llm = OllamaLLM(
+    model="deepseek-r1:8b", 
+    base_url="http://localhost:11434",
+    system= "你是一个遵循 ReAct 格式的智能助手，请严格按照 Thought/Action/Action Input 或 Final Answer 的格式输出。"
+    )
+
+
+# Create the Embedding model
+# 目的是将 "xxxxx" 字符 转变为 向量表示 （x1,y2,.....） 通常维度 1-768 、1536
+embedding_model = OllamaEmbeddings(model="embeddinggemma:300m", base_url="http://localhost:11434")
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>隐私</th>
+<th>能力支持</th>
+<th>限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本地模型，例如Ollama</td>
+<td>是否支持ReAct、电脑性能、可视化模型</td>
+<td>abliterated模型和普通模型（非法问题提醒不予回答）</td>
+</tr>
+<tr>
+<td>大模型厂商，例如OpenAI、DeepSeek</td>
+<td>token支付，月租选择</td>
+<td>国内IP封禁，信用卡支付，注册难（hugging face）</td>
+</tr>
+</tbody>
+</table>
+<h3>3. Agent 模板</h3>
+<blockquote>
+<p>具体模板 建议查看官网提示、GitHub、AI 提示生成（Copilot等）</p>
+</blockquote>
+<pre><code>from langchain_core.prompts import PromptTemplate
+
+# Define the agent prompt
+agent_prompt = PromptTemplate.from_template("""
+你是一个智能助手，擅长使用工具解决问题。
+
+你可以使用以下工具：
+{tool_names}
+
+工具详细信息如下：
+{tools}
+
+请根据用户的问题进行推理，并决定是否需要使用工具。如果需要，请严格按照以下格式输出：
+
+Question: 用户的问题
+Thought: 你对问题的思考
+Action: 工具名称
+Action Input: 工具的输入内容
+
+或者：
+
+Thought: 你对问题的思考
+Final Answer: 最终答案
+
+以下是几个示例：
+
+Question: 你最喜欢的电影是什么？
+Thought: 这是一个关于电影偏好的问题，我可以使用 General Chat 工具来回答。
+Action: General Chat
+Action Input: "你最喜欢的电影是什么？"
+
+Question: 谁是《盗梦空间》的导演？
+Thought: 这是一个关于电影信息的问题，我可以直接回答。
+Final Answer: 《盗梦空间》的导演是克里斯托弗·诺兰。
+
+现在请回答下面的问题：
+
+Question: {input}
+{agent_scratchpad}
+""")
+</code></pre>
+<h3>4. TOOLS</h3>
+<p>:::fold[get_movie_plot 工具实现]</p>
+<pre><code># 这里不需要理解具体实现，只关注get_movie_plot如何转变为工具即可，如需了解可以查看Neo4j官网的向量索引、RAG基础教程部分。
+# 提供向量搜索， neo4j中数据存在一个向量索引绑定着维度属性[],
+# embedding模型将用户的搜索、提问转换为维度，retrieval检索利用相似算法找到最相似的数据集；
+# 再将数据集转换为文本，通过模板生成回复。
+
+"""
+ {
+    name: "hello",
+    description: "Says hello to the user",
+    embeddings:[x1,y2,z3,....]
+
+ }
+
+query = "你好" ===&gt; embedding model===&gt; [x1,y2,z3,....] ===&gt; retrieve ==compares with===&gt; [x1,y2,z3,....]  ===&gt; {name: "hello"}
+
+"""
+
+import streamlit as st
+from llm import llm, embeddings
+from graph import graph
+
+# tag::import_vector[]
+from langchain_neo4j import Neo4jVector
+# end::import_vector[]
+# tag::import_chain[]
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains import create_retrieval_chain
+# end::import_chain[]
+
+# tag::import_chat_prompt[]
+from langchain_core.prompts import ChatPromptTemplate
+# end::import_chat_prompt[]
+
+
+# tag::vector[]
+neo4jvector = Neo4jVector.from_existing_index(
+    embeddings,                              # &lt;1&gt;
+    graph=graph,                             # &lt;2&gt;
+    index_name="moviePlots",                 # &lt;3&gt;
+    node_label="Movie",                      # &lt;4&gt;
+    text_node_property="plot",               # &lt;5&gt;
+    embedding_node_property="plotEmbedding", # &lt;6&gt;
+    retrieval_query="""
+RETURN
+    node.plot AS text,
+    score,
+    {
+        title: node.title,
+        directors: [ (person)-[:DIRECTED]-&gt;(node) | person.name ],
+        actors: [ (person)-[r:ACTED_IN]-&gt;(node) | [person.name, r.role] ],
+        tmdbId: node.tmdbId,
+        source: 'https://www.themoviedb.org/movie/'+ node.tmdbId
+    } AS metadata
+"""
+)
+# end::vector[]
+
+# tag::retriever[]
+retriever = neo4jvector.as_retriever()
+# end::retriever[]
+
+# tag::prompt[]
+instructions = (
+    "Use the given context to answer the question."
+    "If you don't know the answer, say you don't know."
+    "Context: {context}"
+)
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", instructions),
+        ("human", "{input}"),
+    ]
+)
+# end::prompt[]
+
+# tag::chain[]
+question_answer_chain = create_stuff_documents_chain(llm, prompt)
+plot_retriever = create_retrieval_chain(
+    retriever, 
+    question_answer_chain
+)
+# end::chain[]
+
+# tag::get_movie_plot[]
+def get_movie_plot(input):
+    return plot_retriever.invoke({"input": input})
+# end::get_movie_plot[]
+
+</code></pre>
+<p><strong>相关性算法</strong>：
+<a href="https://guangzhengli.com/blog/zh/vector-database#%E7%9B%B8%E4%BC%BC%E6%80%A7%E6%B5%8B%E9%87%8F-similarity-measurement">向量数据库</a></p>
+<blockquote>
+<p>理解可以基于二维平面理解，归纳法拓展到n维空间。&lt;br&gt;</p>
+</blockquote>
+<ul>
+<li>基于两点间距离（欧几里得距离）： n 维坐标系中，两点的距离  （Neo4j可选择）</li>
+<li>基于余弦相似度：n 维向量空间中，两个向量的夹角的余弦值     （Neo4j可选择）</li>
+<li>基于点积</li>
+</ul>
+<p>:::</p>
+<pre><code># Create a set of tools
+tools = [
+        Tool.from_function(
+        name="General Chat",
+        description="For general movie chat not covered by other tools",
+        func=movie_chat.invoke,
+        ),
+        # Add more tools here...
+        Tool.from_function(
+        name="Movie Plot Search",  
+        description="For when you need to find information about movies based on a plot",
+        func=get_movie_plot, 
+        )
+]
+# Create chat history callback
+def get_memory(session_id):
+    return 
+# Create the agent
+agent_prompt = PromptTemplate.from_template()
+
+agent = create_react_agent(llm, tools, agent_prompt)
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,
+    handle_parsing_errors=True,
+    )
+
+chat_agent = RunnableWithMessageHistory(
+    agent_executor,
+    get_memory,
+    input_messages_key="input",
+    history_messages_key="chat_history",
+)
+
+# Create a handler to call the agent
+def generate_response(user_input):
+    """
+    Create a handler that calls the Conversational agent
+    and returns a response to be rendered in the UI
+    """
+
+    response = chat_agent.invoke(
+        {"input": user_input},
+        {"configurable": {"session_id": get_session_id()}},)
+
+    return response['output']
+</code></pre>
+<h3>5. 问题</h3>
+<ul>
+<li>
+<ol>
+<li>模型切换</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>Neo4j 教程提供的是 OpenAI的模型，但是OpenAI免费额度取消，需要国外账户或者信用卡充值；&lt;br&gt;
+切换Ollama 本地模型，
+<strong>注意点：</strong></p>
+</blockquote>
+<ul>
+<li>vpn 代理可能导致模型连接失败；</li>
+<li>教程的requirement没有安装langchain_ollama;</li>
+<li>向量搜索错误，维度不匹配，embedding模型和向量索引维度不匹配，手动为沙盒neo4j添加768维度的向量索引；</li>
+</ul>
+<ul>
+<li>
+<ol>
+<li>ReAct 格式</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>agent 提示模板错误，可能导致模型无法理解问题，报 <code>Invalid Format: Missing 'Action:' after 'Thought:'</code> 错误；&lt;br&gt;
+模型的选择，查看是否支持 Tools 功能，是否支持 ReAct 格式；&lt;br&gt;
+<strong>解决方案：</strong></p>
+</blockquote>
+<ul>
+<li>调整 agent 提示模板，添加 <code>Action:</code> 字段,不同模型理解不同格式，需要调整模板；</li>
+<li>PromptTemplate.from_template中 {tool_names} 、{tools}都是必须参数，否则会报错；</li>
+</ul>
+<ul>
+<li>
+<ol>
+<li>格式错误</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>输出内容不符和解析器要求；
+<a href="https://js.langchain.com/docs/troubleshooting/errors/OUTPUT_PARSING_FAILURE/">OUTPUT_PARSING_FAILURE</a></p>
+</blockquote>
+<ul>
+<li>handle_parsing_errors=True, 处理解析错误；</li>
+<li>控制格式规范</li>
+</ul>
+]]></content:encoded>
+        </item>
         <item>
             <title><![CDATA[大文件内容读取以及文件处理思路]]></title>
             <link>https://sanswl.github.io//posts/file-readthinking/</link>
@@ -3955,36 +4252,6 @@ public interface ApiService {
 等价于 new httpclient(eurekaClient) =&gt; 发送 /index 接口并接受到response
 */
 </code></pre>
-]]></content:encoded>
-        </item>
-        <item>
-            <title><![CDATA[MVCC 版本并发控制]]></title>
-            <link>https://sanswl.github.io//posts/b90d6666-487a/</link>
-            <guid isPermaLink="false">https://sanswl.github.io//posts/b90d6666-487a/</guid>
-            <pubDate>Tue, 11 Mar 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[必须是支持ACID的存储引擎，譬如Mysql的InnoDB <br> Mysql中mvcc的实现是利用undolog日志和 事务id 以及...]]></description>
-            <content:encoded><![CDATA[<h1>一 MVCC前提</h1>
-<blockquote>
-<p>必须是支持<code>ACID</code>的存储引擎，譬如Mysql的<code>InnoDB</code>  &lt;br&gt;
-Mysql中mvcc的实现是利用<code>undolog</code>日志和 <code>事务id</code> 以及 <code>ReadView</code>实现； &lt;br&gt;
-<code>ReadView（视图）</code>主要实现的完成事务间的数据可见性 &lt;br&gt;
-Mysql维护着redolog 、binlog、undolog三种日志：
-&lt;a href="https://blog.csdn.net/Weixiaohuai/article/details/117896523" name="redolog"&gt;redolog&lt;/a&gt;：用于数据库异常宕机的恢复工作；innodb存储引擎特有的；物理层；循环覆写 &lt;br&gt;
-&lt;a href="https://www.cnblogs.com/Presley-lpc/p/9619571.html" name="redolog"&gt;binlog&lt;/a&gt;: server共有、逻辑层；备份；追加写入append (需要配置文件开启默认关闭，每次重启都会创建新的binlog，且目录会创建mysql-binlog.index文件，内容为binlog文件名，会先从第一行读取，若第一行空会导致报错)&lt;br&gt;
-&lt;a href="https://zhuanlan.zhihu.com/p/383824552" name="redolog"&gt;undolog&lt;/a&gt; : 用于事务回滚，意为撤销或取消，以撤销操作为目的，将数据返回到某个状态的操作，实现事务的原子性</p>
-</blockquote>
-<h1>二 操作逻辑</h1>
-<blockquote>
-<p>利用Undolog文件中的回滚指针进行数据的回退,利用事务id和ReadView实现事务间的可见性 &lt;br&gt;
-二级索引可通过回表操作实现MVCC，另二级索引维护了自己最后操作的事务id <code>MAX_TRX_ID</code>,再通过 ReadView 中活跃事务id判断可见性；&lt;br&gt;
-DB_TRX_ID：记录最后一次修改该行的事务 ID。&lt;br&gt;
-DB_ROLL_PTR：指向 Undo Log 的指针，用于访问该行的历史版本。&lt;br&gt;</p>
-</blockquote>
-<h1>三 视图可见性</h1>
-<blockquote>
-<p>视图依据创建时间维护一组活跃的事务ids，和视图创建范围的事务id，包含生成此视图后下一个生成的事务id和生成视图前活跃事务的最小id，利用事务id关系完成可见性判断</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311160745728-1401991784.png" alt="" /></p>
 ]]></content:encoded>
         </item>
     </channel>
