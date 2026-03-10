@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//ru/</id>
     <title>Переверстка</title>
-    <updated>2025-10-30T13:34:48.664Z</updated>
+    <updated>2026-03-10T18:53:47.623Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -12,5 +12,5 @@
     <link rel="alternate" href="https://sanswl.github.io//ru/"/>
     <link rel="self" href="https://sanswl.github.io/ru/atom.xml"/>
     <subtitle>Retypeset — это статическая тема блога, основанная на фреймворке Astro. Вдохновленная Typography, Retypeset устанавливает новый визуальный стандарт и переосмысливает компоновку всех страниц, создавая опыт чтения, напоминающий печатные книги, возрождая красоту типографики. Детали в каждом взгляде, элегантность в каждом пространстве.</subtitle>
-    <rights>Copyright © 2025 SANSWL</rights>
+    <rights>Copyright © 2026 SANSWL</rights>
 </feed>

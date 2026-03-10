@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//zh-tw/</id>
     <title>重新編排</title>
-    <updated>2025-10-30T13:34:48.665Z</updated>
+    <updated>2026-03-10T18:53:47.624Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -12,5 +12,5 @@
     <link rel="alternate" href="https://sanswl.github.io//zh-tw/"/>
     <link rel="self" href="https://sanswl.github.io/zh-tw/atom.xml"/>
     <subtitle>Retypeset是一款基於Astro框架的靜態部落格主題，中文名為重新編排。本主題以活版印字為設計靈感，通過建立全新的視覺規範，對所有頁面進行重新編排，打造紙質書頁般的閱讀體驗，再現版式之美。所見皆為細節，方寸盡顯優雅。</subtitle>
-    <rights>Copyright © 2025 SANSWL</rights>
+    <rights>Copyright © 2026 SANSWL</rights>
 </feed>

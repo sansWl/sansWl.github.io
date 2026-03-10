@@ -5,11 +5,11 @@
         <title>Переверстка</title>
         <link>https://sanswl.github.io//ru/</link>
         <description>Retypeset — это статическая тема блога, основанная на фреймворке Astro. Вдохновленная Typography, Retypeset устанавливает новый визуальный стандарт и переосмысливает компоновку всех страниц, создавая опыт чтения, напоминающий печатные книги, возрождая красоту типографики. Детали в каждом взгляде, элегантность в каждом пространстве.</description>
-        <lastBuildDate>Thu, 30 Oct 2025 13:34:48 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 10 Mar 2026 18:53:47 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
         <language>ru</language>
-        <copyright>Copyright © 2025 SANSWL</copyright>
+        <copyright>Copyright © 2026 SANSWL</copyright>
         <atom:link href="https://sanswl.github.io/ru/rss.xml" rel="self" type="application/rss+xml"/>
     </channel>
 </rss>

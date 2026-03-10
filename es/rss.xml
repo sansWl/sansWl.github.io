@@ -5,11 +5,11 @@
         <title>Retipografía</title>
         <link>https://sanswl.github.io//es/</link>
         <description>Retypeset es un tema de blog estático basado en el framework Astro. Inspirado por Typography, Retypeset establece un nuevo estándar visual y reimagina el diseño de todas las páginas, creando una experiencia de lectura similar a la de los libros impresos, reviviendo la belleza de la tipografía. Detalles en cada mirada, elegancia en cada espacio.</description>
-        <lastBuildDate>Thu, 30 Oct 2025 13:34:48 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 10 Mar 2026 18:53:47 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
         <language>es</language>
-        <copyright>Copyright © 2025 SANSWL</copyright>
+        <copyright>Copyright © 2026 SANSWL</copyright>
         <atom:link href="https://sanswl.github.io/es/rss.xml" rel="self" type="application/rss+xml"/>
     </channel>
 </rss>

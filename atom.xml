@@ -3,7 +3,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://sanswl.github.io//</id>
     <title>SANSWL's BLOG</title>
-    <updated>2025-10-30T13:34:42.570Z</updated>
+    <updated>2026-03-10T18:53:43.748Z</updated>
     <generator>Astro-Theme-Retypeset with Feed for Node.js</generator>
     <author>
         <name>SANSWL</name>
@@ -12,7 +12,84 @@
     <link rel="alternate" href="https://sanswl.github.io//"/>
     <link rel="self" href="https://sanswl.github.io/atom.xml"/>
     <subtitle>Retypeset是一款基于Astro框架的静态博客主题，中文名为重新编排。本主题以活版印字为设计灵感，通过建立全新的视觉规范，对所有页面进行重新编排，打造纸质书页般的阅读体验，再现版式之美。所见皆为细节，方寸尽显优雅。</subtitle>
-    <rights>Copyright © 2025 SANSWL</rights>
+    <rights>Copyright © 2026 SANSWL</rights>
+    <entry>
+        <title type="html"><![CDATA[LLMs-应用2-文本分析]]></title>
+        <id>https://sanswl.github.io//posts/llms-usage-wordsana/</id>
+        <link href="https://sanswl.github.io//posts/llms-usage-wordsana/"/>
+        <updated>2026-02-05T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[文本内容：文本内容关键字加权、去除无用信息（比如分段符合：1：等）； 文本比对: 利用 相似度 算法 、Embedding 操作（向量化...]]></summary>
+        <content type="html"><![CDATA[<h3>1、LLMs 文本分析</h3>
+<h4>1.1、 如何简化文本内容？ 文本内容比对？</h4>
+<blockquote>
+<p><em><strong>文本内容</strong></em>：文本内容关键字加权、去除无用信息（比如分段符合：<code>1：</code>等）；</p>
+<p><em><strong>文本比对</strong></em>: 利用 相似度 算法 、Embedding 操作（向量化），判断文章内容的相关性，并转为可视值；</p>
+</blockquote>
+<p><em><strong>相似度算法</strong></em>： ES 中的搜索相关性算分</p>
+<ul>
+<li>TF-IDF算法(缺陷：词条频率越高，文档得分也会越高，单个词条对文档影响较大)</li>
+<li>BM25算法，elasticsearch5.1版本后采用的算法</li>
+</ul>
+<p><em><strong>向量化</strong></em>：向量化操作简单说，就是将数据撒在坐标系上，通过坐标系判断数据点间的相关性（两点间距离，两点的夹角等判断）</p>
+<pre><code># 向量化 vectorizer = TfidfVectorizer() tfidf_matrix = vectorizer.fit_transform([textA, textB]) 
+# 余弦相似度 similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+</code></pre>
+<h4>1.2、 文本搜索词的模糊化处理</h4>
+<blockquote>
+<p>文本比对时，可能遇到对文本内某些关键字进行加权处理，但如果文本过长或者具体内容专业化，便会导致文本内容难以加权，可以采用模糊关键字操作处理，例如 <code>学生</code> --&gt;{<code>小学生</code>,<code>初中生</code>,<code>高中生</code>  ......},当搜索 <em>学生</em> 时，模糊的结果依旧能被加权，意义相似；</p>
+</blockquote>
+<h3>2、 文件读取转化</h3>
+<blockquote>
+<p>通过读取PDF、WORD、MD文件接收比对文本信息；</p>
+</blockquote>
+<h4>2.1 、文本如何转化？同类文本模板化处理？</h4>
+<blockquote>
+<p>python框架：MarkItDown、docling：允许将docx、md、音图等文件转为某种类型文件，比如md</p>
+</blockquote>
+<blockquote>
+<p><code>1、例子：简历模板解析策略</code></p>
+</blockquote>
+<p>简历内容主要分为 <code>基本信息</code>,<code>工作经历</code>,<code>项目经历</code>,<code>技能</code>,<code>证书</code>几个模块。&lt;/br&gt;</p>
+<blockquote>
+<p>·<code>1</code>解析经过转换的文档，确保各文件信息输入源一致；&lt;/br&gt;
+·<code>2</code>指定关键字进行文档分割，例如上述简历中的几个关键字；&lt;/br&gt;
+·<code>3</code>开始解析文件输入流，为了避免重复调用LLM Embedding 模型，按行缓存处理
+以行作为索引（前置要求，简历标题的关键字为单独行开头），通过LLM Embedding比对关键字，达到一定相似度后存储索引{"keyword":"index"},然后依据index截取文本&lt;/br&gt;
+·<code>4</code>提前优化关键字key_map={'key_word':[vector]...},清理文件输入流无关字符等，可以减少token和接口响应时间 &lt;/br&gt;
+·<code>5</code>额外思路：模糊处理，简历各描述词可能不一致，可以允许指定关键字然后将文档内词替换或者替换优化关键字的key_map&lt;/br&gt;</p>
+</blockquote>
+<h4>2.2 、根据文档比较确定学习路线（一种思路）</h4>
+<blockquote>
+<p>通过简历文档比较确定学习路线，通过爬虫等手段从Github、招聘网站获取和简历比对内容（项目、专业技能。。。）
+利用AI 大模型 进行文档分析确认路线，再利用向量数据库，使用图存储初始和最终点，边为爬取的GitHub和招聘网站相关</p>
+</blockquote>
+<p><strong>参考代码链接 ：</strong></p>
+<p>::github{repo="sansWl/ai-prase"}</p>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2026-02-05T00:00:00.000Z</published>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JVM 虚拟机规范]]></title>
+        <id>https://sanswl.github.io//posts/jvms-define-link/</id>
+        <link href="https://sanswl.github.io//posts/jvms-define-link/"/>
+        <updated>2025-11-20T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[JVM是Java、Kotlin等jvm系语言实现跨平台的代码执行器 JVM 规范]]></summary>
+        <content type="html"><![CDATA[<h3>1. JVM简介</h3>
+<blockquote>
+<p>JVM是Java、Kotlin等jvm系语言实现跨平台的代码执行器</p>
+</blockquote>
+<p><a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html">JVM 规范</a></p>
+]]></content>
+        <author>
+            <name>SANSWL</name>
+            <uri>https://sanswl.github.io//</uri>
+        </author>
+        <published>2025-11-20T00:00:00.000Z</published>
+    </entry>
     <entry>
         <title type="html"><![CDATA[LLMs-应用1-聊天机器人]]></title>
         <id>https://sanswl.github.io//posts/llms-usage-chatbot/</id>
@@ -4114,271 +4191,5 @@ graph TD;
             <uri>https://sanswl.github.io//</uri>
         </author>
         <published>2025-03-13T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Bat脚本启动本地Kafka]]></title>
-        <id>https://sanswl.github.io//posts/bc002c30-f7c2/</id>
-        <link href="https://sanswl.github.io//posts/bc002c30-f7c2/"/>
-        <updated>2025-03-11T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[本地启动Kafka，当需要测试多个Kafka Broker时使用脚本启动多个实例 编写 bat 文件，将下述代码填入保存，注意路径配置 ...]]></summary>
-        <content type="html"><![CDATA[<h1>一：功能介绍</h1>
-<blockquote>
-<p>本地启动Kafka，当需要测试多个Kafka Broker时使用脚本启动多个实例</p>
-</blockquote>
-<h1>二：使用介绍</h1>
-<blockquote>
-<p>编写 <code>bat</code> 文件，将下述代码填入保存，<em><strong>注意路径配置</strong></em></p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152627310-894820133.png" alt="" /></p>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311152735206-581968248.png" alt="" /></p>
-<pre><code>@echo off
-@REM 声明 UTF-8 编码，避免乱码问题
-chcp 65001
-setlocal enabledelayedexpansion  
-@REM 代表脚本启动的当前路径，如上图，脚本处于kafka\kafka_2.13-xxx
-set cds=%~dp0 
-set zookeeper_config=%cds%config\zookeeper.properties
-set zookeeper_Server=zookeeper-server-start.bat
-set kafka_server=%cds%bin\windows\kafka-server-start.bat
-set brokernum=0
-@REM %1 表示第一个参数，没有参数即server.properties缺失
-if "%1" == "" ( echo 请输入Kafka的Broker的配置文件路径 
-) else (
-
-   @REM 启动zookeeper
-   start "zookeeper" cmd /k call %cds%bin\windows\%zookeeper_Server%  %zookeeper_config%
-   timeout /t 2
-
-   @REM 按参数顺序启动 Kafka broker实例 打开的窗口按照 kafka_1、kafka_2命名格式
-   for %%i in (%*) do (
-    set /a brokernum += 1
-    @Rem  "kafka_"!brokernum!  窗口命名
-    start "kafka_"!brokernum! cmd /k call %kafka_server% %cds%%%i
-   )
-
-)
-
-
-
-pause &gt;nul
-</code></pre>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-11T00:00:00.000Z</published>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Eureka服务注册发现源码流程简析]]></title>
-        <id>https://sanswl.github.io//posts/f14c8695-a3e9/</id>
-        <link href="https://sanswl.github.io//posts/f14c8695-a3e9/"/>
-        <updated>2025-03-11T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[客户端通过执行InstanceInfoReplicator#run()调用DiscoveryClient#register()发送http...]]></summary>
-        <content type="html"><![CDATA[<h3>一： 服务的注册</h3>
-<blockquote>
-<p>客户端通过执行InstanceInfoReplicator#run()调用DiscoveryClient#register()发送http请求进行注册
-<code>InstanceInfoReplicator</code> 是更新同步当前服务到服务端的任务实现
-//A task for updating and replicating the local instanceinfo to the remote server.</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311142333132-1751032344.png" alt="" /></p>
-<pre><code>//服务注册
-boolean register() throws Throwable {
-        logger.info("DiscoveryClient_{}: registering service...", this.appPathIdentifier);
-
-        EurekaHttpResponse httpResponse;
-        try {
-            httpResponse = this.eurekaTransport.registrationClient.register(this.instanceInfo);
-        } catch (Exception var3) {
-            Exception e = var3;
-            logger.warn("DiscoveryClient_{} - registration failed {}", new Object[]{this.appPathIdentifier, e.getMessage(), e});
-            throw e;
-        }
-
-        if (logger.isInfoEnabled()) {
-            logger.info("DiscoveryClient_{} - registration status: {}", this.appPathIdentifier, httpResponse.getStatusCode());
-        }
-
-        return httpResponse.getStatusCode() == Status.NO_CONTENT.getStatusCode();
-    }
-//服务续约
-/**
-eureka 初始化定时任务，依据设定的心跳时间触发 renew方法，检测服务是否宕机
-*/
-    boolean renew() {
-        try {
-            EurekaHttpResponse&lt;InstanceInfo&gt; httpResponse = this.eurekaTransport.registrationClient.sendHeartBeat(this.instanceInfo.getAppName(), this.instanceInfo.getId(), this.instanceInfo, (InstanceInfo.InstanceStatus)null);
-            logger.debug("DiscoveryClient_{} - Heartbeat status: {}", this.appPathIdentifier, httpResponse.getStatusCode());
-            if (httpResponse.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
-                this.REREGISTER_COUNTER.increment();
-                logger.info("DiscoveryClient_{} - Re-registering apps/{}", this.appPathIdentifier, this.instanceInfo.getAppName());
-                long timestamp = this.instanceInfo.setIsDirtyWithTime();
-                boolean success = this.register();
-                if (success) {
-                    this.instanceInfo.unsetIsDirty(timestamp);
-                }
-
-                return success;
-            } else {
-                return httpResponse.getStatusCode() == Status.OK.getStatusCode();
-            }
-        } catch (Throwable var5) {
-            Throwable e = var5;
-            logger.error("DiscoveryClient_{} - was unable to send heartbeat!", this.appPathIdentifier, e);
-            return false;
-        }
-    }
-</code></pre>
-<blockquote>
-<p>服务端服务注册接受和存储</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311143033813-575040911.png" alt="" /></p>
-<pre><code>//eureka 客户端会通过此方法注册保存到eureka server 的内存中
-public void register(InstanceInfo registrant, int leaseDuration, boolean isReplication) {
-        this.read.lock();
-
-        try {
-            Map&lt;String, Lease&lt;InstanceInfo&gt;&gt; gMap = (Map)this.registry.get(registrant.getAppName());
-            EurekaMonitors.REGISTER.increment(isReplication);
-            if (gMap == null) {
-                ConcurrentHashMap&lt;String, Lease&lt;InstanceInfo&gt;&gt; gNewMap = new ConcurrentHashMap();
-                gMap = (Map)this.registry.putIfAbsent(registrant.getAppName(), gNewMap);
-                if (gMap == null) {
-                    gMap = gNewMap;
-                }
-            }
-
-            Lease&lt;InstanceInfo&gt; existingLease = (Lease)((Map)gMap).get(registrant.getId());
-            if (existingLease != null &amp;&amp; existingLease.getHolder() != null) {
-                Long existingLastDirtyTimestamp = ((InstanceInfo)existingLease.getHolder()).getLastDirtyTimestamp();
-                Long registrationLastDirtyTimestamp = registrant.getLastDirtyTimestamp();
-                logger.debug("Existing lease found (existing={}, provided={}", existingLastDirtyTimestamp, registrationLastDirtyTimestamp);
-                if (existingLastDirtyTimestamp &gt; registrationLastDirtyTimestamp) {
-                    logger.warn("There is an existing lease and the existing lease's dirty timestamp {} is greater than the one that is being registered {}", existingLastDirtyTimestamp, registrationLastDirtyTimestamp);
-                    logger.warn("Using the existing instanceInfo instead of the new instanceInfo as the registrant");
-                    registrant = (InstanceInfo)existingLease.getHolder();
-                }
-            } else {
-                synchronized(this.lock) {
-                    if (this.expectedNumberOfClientsSendingRenews &gt; 0) {
-                        ++this.expectedNumberOfClientsSendingRenews;
-                        this.updateRenewsPerMinThreshold();
-                    }
-                }
-
-                logger.debug("No previous lease information found; it is new registration");
-            }
-
-            Lease&lt;InstanceInfo&gt; lease = new Lease(registrant, leaseDuration);
-            if (existingLease != null) {
-                lease.setServiceUpTimestamp(existingLease.getServiceUpTimestamp());
-            }
-
-            ((Map)gMap).put(registrant.getId(), lease);
-            this.recentRegisteredQueue.add(new Pair(System.currentTimeMillis(), registrant.getAppName() + "(" + registrant.getId() + ")"));
-            if (!InstanceStatus.UNKNOWN.equals(registrant.getOverriddenStatus())) {
-                logger.debug("Found overridden status {} for instance {}. Checking to see if needs to be add to the overrides", registrant.getOverriddenStatus(), registrant.getId());
-                if (!this.overriddenInstanceStatusMap.containsKey(registrant.getId())) {
-                    logger.info("Not found overridden id {} and hence adding it", registrant.getId());
-                    this.overriddenInstanceStatusMap.put(registrant.getId(), registrant.getOverriddenStatus());
-                }
-            }
-
-            InstanceInfo.InstanceStatus overriddenStatusFromMap = (InstanceInfo.InstanceStatus)this.overriddenInstanceStatusMap.get(registrant.getId());
-            if (overriddenStatusFromMap != null) {
-                logger.info("Storing overridden status {} from map", overriddenStatusFromMap);
-                registrant.setOverriddenStatus(overriddenStatusFromMap);
-            }
-
-            InstanceInfo.InstanceStatus overriddenInstanceStatus = this.getOverriddenInstanceStatus(registrant, existingLease, isReplication);
-            registrant.setStatusWithoutDirty(overriddenInstanceStatus);
-            if (InstanceStatus.UP.equals(registrant.getStatus())) {
-                lease.serviceUp();
-            }
-
-            registrant.setActionType(ActionType.ADDED);
-            this.recentlyChangedQueue.add(new RecentlyChangedItem(lease));
-            registrant.setLastUpdatedTimestamp();
-            this.invalidateCache(registrant.getAppName(), registrant.getVIPAddress(), registrant.getSecureVipAddress());
-            logger.info("Registered instance {}/{} with status {} (replication={})", new Object[]{registrant.getAppName(), registrant.getId(), registrant.getStatus(), isReplication});
-        } finally {
-            this.read.unlock();
-        }
-
-    }
-</code></pre>
-<blockquote>
-<p>如图，registry保存有将注册、已注册到server 的eureka客户端 instance信息；
-将要注册到注册表registry中的instance，会创建一个map结构保存</p>
-</blockquote>
-<p><img src="https://img2024.cnblogs.com/blog/3426265/202503/3426265-20250311135621493-58076025.png" alt="" /></p>
-<h3>二： 服务的发现</h3>
-<blockquote>
-<p>依据上图展示，服务注册采取的是客户端创立DiscoveryClient建立http请求，同理利用此DiscoveryClient实例通过请求完成服务的发现，不再赘述；
-重点将放入服务发现的缓存和调用</p>
-</blockquote>
-<p><code>1.</code></p>
-<pre><code>//其他发现实现 DiscoveryClient#getAndUpdateDelta 包括更新等具体操作不作继续深入讨论
-    /**
-     * Gets the full registry information from the eureka server and stores it locally.
-     * When applying the full registry, the following flow is observed:
-     *
-     * if (update generation have not advanced (due to another thread))
-     *   atomically set the registry to the new registry
-     * fi
-     *
-     * @return the full registry information.
-     * @throws Throwable
-     *             on error.
-     */
-    private void getAndStoreFullRegistry() throws Throwable {
-        long currentUpdateGeneration = fetchRegistryGeneration.get();
-
-        logger.info("Getting all instance registry info from the eureka server");
-
-        Applications apps = null;
-        EurekaHttpResponse&lt;Applications&gt; httpResponse = clientConfig.getRegistryRefreshSingleVipAddress() == null
-                ? eurekaTransport.queryClient.getApplications(remoteRegionsRef.get())
-                : eurekaTransport.queryClient.getVip(clientConfig.getRegistryRefreshSingleVipAddress(), remoteRegionsRef.get());
-        if (httpResponse.getStatusCode() == Status.OK.getStatusCode()) {
-            apps = httpResponse.getEntity();
-        }
-        logger.info("The response status is {}", httpResponse.getStatusCode());
-
-        if (apps == null) {
-            logger.error("The application is null for some reason. Not storing this information");
-        } else if (fetchRegistryGeneration.compareAndSet(currentUpdateGeneration, currentUpdateGeneration + 1)) {
-    //存入本地服务缓存，即客户端将server端的服务注册信息缓存了一份，存在后续的缓存更新机制不做深入
-    //this.filterAndShuffle(apps) 目的是处理 UP 状态的实例以及 打乱保证随机性 
-    // Shuffling helps in randomizing the applications list there by avoiding the same instances receiving traffic during start ups.
-            localRegionApps.set(this.filterAndShuffle(apps));
-            logger.debug("Got full registry with apps hashcode {}", apps.getAppsHashCode());
-        } else {
-            logger.warn("Not updating applications as another thread is updating it already");
-        }
-    }
-</code></pre>
-<p><code>2.</code> 调用</p>
-<blockquote>
-<p>一： 利用DiscoveryClient获取实例的信息，再构建http请求
-二： 使用组件fegin完成服务转发</p>
-</blockquote>
-<pre><code>@FeignClient(value = "eurekaclient")
-public interface ApiService {
-
-   @RequestMapping(value = "/index",method = RequestMethod.GET)
-   String index();
-}
-
-/**
-等价于 new httpclient(eurekaClient) =&gt; 发送 /index 接口并接受到response
-*/
-</code></pre>
-]]></content>
-        <author>
-            <name>SANSWL</name>
-            <uri>https://sanswl.github.io//</uri>
-        </author>
-        <published>2025-03-11T00:00:00.000Z</published>
     </entry>
 </feed>
